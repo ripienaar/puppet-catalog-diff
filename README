@@ -1,0 +1,42 @@
+A tool to compare 2 Puppet catalogs.
+
+While upgrading versions of Puppet you want to ensure that
+no unexpected changes will be made prior to doing the upgrade.
+
+This tool will allow you to diff catalogs created by different
+versions of Puppet.  This will let you guage the impact of a
+Puppet upgrade before actually touching any of your nodes.
+
+This is roughly the version of the code that works, it's not
+clean code or tested throughly, as I use it to do upgrades in
+the near future there will no doubt be refinements.
+
+Validation Process:
+
+ - Grab a catalog from your existing machine running the old version
+ - Copy it locally and run:
+
+      dumplocalconfig.rb --format yaml fqdn.yaml
+
+ - Configure your new Puppet master, copy the facts from your old master
+   to the new one
+ - Compile the catalog for this host on the new master:
+
+      puppet master --compile fqdn > fqdn.pson
+
+ - Copy the catalog over and run:
+
+      dumplocalconfig.rb --format pson fqdn.pson
+
+ - At this point you should have a dump directory with 2 different catalogs
+   to compare them run:
+
+      diffcatalogs.rb dump/0.24 dump/2.6
+
+
+Future Improvements:
+
+ - Allow specifying output names so you can compare 2 catalogs produced
+   with the same version of puppet
+
+
