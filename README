@@ -7,7 +7,7 @@ This tool will allow you to diff catalogs created by different
 versions of Puppet.  This will let you guage the impact of a
 Puppet upgrade before actually touching any of your nodes.
 
-This is roughly the version of the code that works, it's not
+This is the first version of the code that works, it's not
 clean code or tested throughly, as I use it to do upgrades in
 the near future there will no doubt be refinements.
 
