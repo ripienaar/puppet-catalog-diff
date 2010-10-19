@@ -17,7 +17,7 @@ else
 end
 
 [FROM, TO].each do |r|
-    unless File.exist?("#{r}/resources.yaml")
+    unless File.exist?(r)
         puts "Cannot find resources in #{r}"
         exit 1
     end
@@ -74,8 +74,8 @@ def print_resource_diffs(r1, r2)
     diffresources.each {|resource| puts "\t#{resource}"}
 end
 
-from = YAML.load(File.read("#{FROM}/resources.yaml"))
-to = YAML.load(File.read("#{TO}/resources.yaml"))
+from = YAML.load(File.read(FROM))
+to = YAML.load(File.read(TO))
 
 titles = {}
 titles[:to] = extract_titles(to)

@@ -16,7 +16,7 @@ Validation Process:
  - Grab a catalog from your existing machine running the old version
  - Copy it locally and run:
 
-      dumplocalconfig.rb --format yaml fqdn.yaml
+      dumplocalconfig.rb --format yaml --output 0.24.yaml fqdn.yaml
 
  - Configure your new Puppet master, copy the facts from your old master
    to the new one
@@ -26,18 +26,11 @@ Validation Process:
 
  - Copy the catalog over and run:
 
-      dumplocalconfig.rb --format pson fqdn.pson
+      dumplocalconfig.rb --format pson --output 2.6.yaml fqdn.pson
 
- - At this point you should have a dump directory with 2 different catalogs
-   to compare them run:
+ - At this point you should have 2 different catalogs to compare them run:
 
-      diffcatalogs.rb dump/0.24 dump/2.6
-
-
-Future Improvements:
-
- - Allow specifying output names so you can compare 2 catalogs produced
-   with the same version of puppet
+      diffcatalogs.rb 0.24.yaml 2.6.yaml
 
 
 Example Output:
@@ -71,3 +64,14 @@ a list of that.
 This code only validates the catalogs, it cannot tell you if the behavior of
 the providers that interpret the catalog has changed so testing is still
 recommended, this is just one tool to take away some of the uncertainty
+
+Changelog:
+
+ - 2010/10/19 - Change options and logic so it's easier to use comparing catalogs
+                from the same version of puppet
+
+Contact:
+
+R.I.Pienaar <rip@devco.net>
+www.devco.net
+@ripienaar

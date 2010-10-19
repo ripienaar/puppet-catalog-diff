@@ -38,6 +38,7 @@ require 'digest/md5'
 @notags = false
 @format = :yaml
 @resources = []
+@output = nil
 
 OptionParser.new do |opt|
     opt.banner = "Usage: #{__FILE__} [options] [catalog]"
@@ -48,6 +49,10 @@ OptionParser.new do |opt|
 
     opt.on("--format [FORMAT]", "-f", "Catalog format yaml|pson|marshal") do |v|
         @format = v.to_sym
+    end
+
+    opt.on("--output [FILE]", "-o", "Where to save the catalog dump") do |v|
+        @output = v
     end
 
     opt.on("--help", "-h", "Help") do |v|
@@ -70,17 +75,15 @@ else
     exit 1
 end
 
-if File.exist?("dump/#{@version}")
-    puts "Output directory ./dump/#{@version} already exist"
+unless @output
+    puts("Please specify a file to write using --output")
     exit 1
-else
-    FileUtils.mkdir_p("dump/#{@version}")
 end
 
 localconfig = ARGV[0]
 
 unless File.exist?(localconfig)
-    puts("Please specify a path to a catalog")
+    puts("Please specify a path to a catalog (#{localconfig})")
     exit 1
 end
 
@@ -159,6 +162,7 @@ else
     convert25(pup)
 end
 
-File.open("dump/#{@version}/resources.yaml", "w") do |r|
+File.open(@output, "w") do |r|
     r.print(YAML.dump(@resources))
+    puts "Dumped catalog to #{@output}"
 end
