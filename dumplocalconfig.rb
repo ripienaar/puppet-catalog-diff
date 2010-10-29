@@ -99,6 +99,37 @@ when :pson
 end
 
 
+# capitalize a resource from ["class", "foo::bar"] to Class[Foo::Bar]
+#
+# Dear Puppet 0.24.  Die.
+def capitalizeresource(resource)
+    res = ""
+
+    if resource[0] =~ /class/i
+        res << "Class["
+        res << resource[1].split(/::/).map{|r| r.capitalize}.join("::")
+        res << "]"
+    else
+        res << resource[0].capitalize
+        res << "[" << resource[1] << "]"
+    end
+
+    res
+end
+
+def convert24_resource_array(resources)
+    if resources[0].is_a?(Array)
+        res = []
+        resources.each do |req|
+            res << capitalizeresource(req)
+        end
+    else
+        res = capitalizeresource(resources)
+    end
+
+    res
+end
+
 # Converts Puppet 0.24 and possibly earlier catalogs
 # to our intermediate format
 def convert24(bucket)
@@ -117,7 +148,13 @@ def convert24(bucket)
             resource[:parameters][param.to_sym] = value
         end
 
-        pp resource
+
+        [:subscribe, :require, :notify, :before].each do |property|
+            if resource[:parameters].include?(property)
+                resource[:parameters][property] = convert24_resource_array(resource[:parameters][property].clone)
+            end
+        end
+
         if resource[:parameters].include?(:content)
             resource[:parameters][:content] = Digest::MD5.hexdigest(resource[:parameters][:content])
         end

@@ -7,6 +7,7 @@
 # R.I.Pienaar <rip@devco.net> - www.devco.net - @ripienaar
 
 require 'yaml'
+require 'pp'
 
 if ARGV.size == 2
     FROM = ARGV[0]
@@ -40,7 +41,18 @@ end
 def print_resource(resource)
     puts "\t" + resource[:type].downcase + '{"' +  resource[:title] + '":'
     resource[:parameters].each_pair do |k,v|
-        puts "\t     #{k} => #{v}"
+        if v.is_a?(Array)
+            indent = " " * k.to_s.size
+
+            puts "\t     #{k} => ["
+            v.each do |val|
+                puts "\t     #{indent}     #{val},"
+            end
+
+            puts "\t     #{indent}    ]"
+        else
+            puts "\t     #{k} => #{v}"
+        end
     end
     puts "\t}"
 end
