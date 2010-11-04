@@ -149,6 +149,26 @@ def convert24(bucket)
         end
 
 
+        # remove some dupe properties that 24 tends to put in
+        # that 25 onward doesnt.  This isnt great since some people
+        # do specify both even when they're the same, for those it
+        # will raise false positives but I guess the bulk use case
+        # is being catered for here
+        [:name, :command, :path].each do |property|
+            if resource[:parameters].include?(property)
+                if resource[:title] == resource[:parameters][property]
+                    resource[:parameters].delete(property)
+                end
+            end
+        end
+
+        # Fix up some other weird resources like File in 24 that used
+        # name but now use path
+        if resource[:type] == "file" && resource[:parameters].include?(:name)
+            resource[:parameters][:path] = resource[:parameters][:name]
+            resource[:parameters].delete(:name)
+        end
+
         [:subscribe, :require, :notify, :before].each do |property|
             if resource[:parameters].include?(property)
                 resource[:parameters][property] = convert24_resource_array(resource[:parameters][property].clone)
