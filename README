@@ -1,5 +1,7 @@
 A tool to compare 2 Puppet catalogs.
 
+PLEASE NOTE: This is still early code, its a work in progress specifically I am working on 0.24.x compatibility
+
 While upgrading versions of Puppet you want to ensure that
 no unexpected changes will be made prior to doing the upgrade.
 
