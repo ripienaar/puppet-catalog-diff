@@ -8,13 +8,35 @@
 
 require 'yaml'
 require 'pp'
+require 'rubygems'
+require 'diffy'
+require 'getopt/std'
 
-if ARGV.size == 2
-    FROM = ARGV[0]
-    TO = ARGV[1]
+def print_help()
+  puts
+  puts "USAGE: diffcatalogs.rb -o <ref> -n <test> [-u]"
+  puts "\t -o <ref>  the old catalog"
+  puts "\t -n <test> the new catalog"
+  puts "\t -u        print individual resource diffs in unified diff format"
+  puts
+  exit 1
+end
+
+opt = Getopt::Std.getopts("o:n:u")
+
+if not opt["n"] or not opt["o"]
+  print_help()
+end
+if opt["n"]
+  TO=opt["n"]
+end
+if opt["o"]
+  FROM=opt["o"]
+end
+if opt["u"]
+  UNIFIED=true
 else
-    puts "Please specify a to and from catelog dump dir"
-    exit 1
+  UNIFIED=false
 end
 
 [FROM, TO].each do |r|
@@ -22,7 +44,6 @@ end
         puts "Cannot find resources in #{r}"
         exit 1
     end
-
 end
 
 # Creates an array of just the resource titles
@@ -37,53 +58,50 @@ def extract_titles(resources)
     titles
 end
 
-# Prints a resource in a way that looks like puppet code
-def print_resource(resource)
-    puts "\t" + resource[:type].downcase + '{"' +  resource[:title] + '":'
+# Make a resource into a string that looks like puppet code
+def string_resource(resource)
+    mystring="\t" + resource[:type].downcase + '{"' +  resource[:title] + '":'+"\n"
     resource[:parameters].each_pair do |k,v|
     if v.is_a?(Array)
         indent = " " * k.to_s.size
 
-        puts "\t     #{k} => ["
+        mystring+="\t     #{k} => [\n"
         v.each do |val|
-                puts "\t     #{indent}     #{val},"
+                mystring+="\t     #{indent}     #{val},\n"
         end
-        puts "\t     #{indent}    ]"
+        mystring+="\t     #{indent}    ]\n"
     else
-        puts "\t     #{k} => #{v}"
+        mystring+="\t     #{k} => #{v}\n"
         end
     end
-    puts "\t}"
+    mystring+="\t}\n"
 end
 
 # Compares two sets of resources and prints the differences
 # if the two sets do not include the same resource counts
 # this will only print the resources available in both
-def compare_resources(old, new)
+def compare_resources(old, new, unified)
     puts "Individual Resource differences:"
 
     old.each do |resource|
         new_resource = new.find{|res| res[:resource_id] == resource[:resource_id]}
         next if new_resource.nil?
 
-    # 0.24.x would set eg. on exec the command property to the same as name
-    # even when they were the same, 25 onward doesnt so get rid of these.
-    #
-    # there are no doubt many more
-    #resource[:parameters].delete(:name) unless new_resource[:parameters].include?(:name)
-    #resource[:parameters].delete(:command) unless new_resource[:parameters].include?(:command)
-    #resource[:parameters].delete(:path) unless new_resource[:parameters].include?(:path)
 
         unless new_resource[:parameters] == resource[:parameters]
+          if unified
+            #Only print the diff of resources
+            puts Diffy::Diff.new(  string_resource(resource),  string_resource(new_resource), :diff => "-U 1000")
+          else
             puts "Old Resource:"
-            print_resource(resource)
-
+            puts string_resource(resource)
+            
             puts
-
+            
             puts "New Resource:"
-            print_resource(new_resource)
+            puts string_resource(new_resource)
+          end
         end
-
     end
 end
 
@@ -95,6 +113,7 @@ end
 
 from = YAML.load(File.read(FROM))
 to = YAML.load(File.read(TO))
+unified = UNIFIED 
 
 titles = {}
 titles[:to] = extract_titles(to)
@@ -119,4 +138,4 @@ end
 puts
 puts
 
-compare_resources(from, to)
+compare_resources(from, to, unified)
