@@ -13,26 +13,20 @@ This is the first version of the code that works, it's not
 clean code or tested throughly, as I use it to do upgrades in
 the near future there will no doubt be refinements.
 
+The diff tool recognizes catalogs in yaml, marshall, or pson format.
+
 Validation Process:
 
  - Grab a catalog from your existing machine running the old version
- - Copy it locally and run:
-
-      dumplocalconfig.rb --format yaml --output 0.24.yaml fqdn.yaml
-
  - Configure your new Puppet master, copy the facts from your old master
    to the new one
  - Compile the catalog for this host on the new master:
 
       puppet master --compile fqdn > fqdn.pson
 
- - Copy the catalog over and run:
+ - At this point you should have 2 different catalogs. To compare them run:
 
-      dumplocalconfig.rb --format pson --output 2.6.yaml fqdn.pson
-
- - At this point you should have 2 different catalogs to compare them run:
-
-      diffcatalogs.rb 0.24.yaml 2.6.yaml
+      diffcatalogs.rb <catalog1> <catalog2>
 
 
 Example Output:
