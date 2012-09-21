@@ -22,7 +22,7 @@ Puppet.parse_config
 if Puppet.version =~ /^([0-9]+[.][0-9]+)[.][0-9]+/
     @version = $1
 
-    unless ["0.24", "0.25", "2.6", "2.7"].include?(@version)
+    unless ["0.24", "0.25", "2.6", "2.7", "3.0"].include?(@version)
         puts("Don't know how to compare catalogs for version #{Puppet.version}. Only 0.24, 0.25, 2.6, and 2.7 are supported")
         exit 1
     end
