@@ -9,6 +9,9 @@ This tool will allow you to diff catalogs created by different
 versions of Puppet.  This will let you guage the impact of a
 Puppet upgrade before actually touching any of your nodes.
 
+This tool is delivered as a Puppet Face. It thus requires
+a Puppet installation to properly run.
+
 This is the first version of the code that works, it's not
 clean code or tested throughly, as I use it to do upgrades in
 the near future there will no doubt be refinements.
@@ -26,8 +29,7 @@ Validation Process:
 
  - At this point you should have 2 different catalogs. To compare them run:
 
-      diffcatalogs.rb <catalog1> <catalog2>
-
+      puppet catalog diff <catalog1> <catalog2>
 
 Example Output:
 
@@ -61,7 +63,11 @@ This code only validates the catalogs, it cannot tell you if the behavior of
 the providers that interpret the catalog has changed so testing is still
 recommended, this is just one tool to take away some of the uncertainty
 
+You can get some inline help with:
+  puppet man catalog
+
 Changelog:
+ - 2012/10/20 - Make it a puppet face
 
  - 2010/10/19 - Change options and logic so it's easier to use comparing catalogs
                 from the same version of puppet
