@@ -5,6 +5,8 @@
 
 ################# start methods to compare intermediate format #################
 
+require 'tempfile'
+
 module Puppet::CatalogDiff
 module Comparer
 
@@ -33,6 +35,9 @@ module Comparer
           end
           puts "\t     #{indent}    ]"
       else
+          if k == :content
+            v = v[:checksum]
+          end
           puts "\t     #{k} => #{v}"
           end
       end
@@ -42,7 +47,7 @@ module Comparer
   # Compares two sets of resources and prints the differences
   # if the two sets do not include the same resource counts
   # this will only print the resources available in both
-  def compare_resources(old, new)
+  def compare_resources(old, new, options)
       puts "Individual Resource differences:"
 
       old.each do |resource|
@@ -65,6 +70,15 @@ module Comparer
 
               puts "New Resource:"
               print_resource(new_resource)
+
+              if options[:content_diff] && resource[:parameters][:content] && new_resource[:parameters][:content] && resource[:parameters][:content][:checksum] != new_resource[:parameters][:content][:checksum]
+                puts
+                puts "Content diff:"
+
+                puts str_diff(resource[:parameters][:content][:content], new_resource[:parameters][:content][:content])
+                puts "-" * 80
+                puts
+              end
           end
 
       end
@@ -75,6 +89,19 @@ module Comparer
       result = r1.dup 
       r2.each{|e| result.include?(e) ? result.delete(e) : result.push(e) }
       result.each {|resource| puts "\t#{resource}"}
+  end
+
+  def str_diff(str1, str2)
+    paths = [str1,str2].collect do |s|
+      tempfile = Tempfile.new("puppet-diffing")
+      tempfile.open
+      tempfile.print s
+      tempfile.close
+      tempfile
+    end
+    diff = Puppet::Util::Diff.diff(paths[0].path, paths[1].path)
+    paths.each { |f| f.delete }
+    diff
   end
 end
 end

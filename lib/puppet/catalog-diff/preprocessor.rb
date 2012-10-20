@@ -85,7 +85,7 @@ module Preprocessor
           end
 
           if resource[:parameters].include?(:content)
-              resource[:parameters][:content] = Digest::MD5.hexdigest(resource[:parameters][:content])
+              resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
           end
 
           resource[:resource_id] = "#{bucket.type.downcase}[#{bucket.name}]"
@@ -112,7 +112,7 @@ module Preprocessor
           end
 
           if resource[:parameters].include?(:content)
-              resource[:parameters][:content] = Digest::MD5.hexdigest(resource[:parameters][:content])
+              resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
           end
 
           resource[:resource_id] = "#{target.type.downcase}[#{target.title}]"

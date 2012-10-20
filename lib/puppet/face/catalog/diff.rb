@@ -5,6 +5,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
   action :diff do
     summary "Compare catalogs from different puppet versions."
     arguments "<catalog1> <catalog2>"
+
+    option "--content_diff" do
+      summary "Whether to show a diff for File resource content"
+    end
+
     description <<-'EOT'
       Prints the differences between catalogs compiled by different puppet master to help
       during migrating to a new Puppet version.
@@ -66,9 +71,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     EOT
 
     when_invoked do |catalog1, catalog2, options|
-      Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff
+      Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
     end
-
-
   end
 end

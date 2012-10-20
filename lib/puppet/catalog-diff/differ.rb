@@ -41,7 +41,7 @@ class Differ
     end
   end
 
-  def diff
+  def diff(options = {})
     from = []
     to   = []
     { from_file => from, to_file => to}.each do |r,v|
@@ -78,7 +78,7 @@ class Differ
     print_resource_diffs(titles[:to], titles[:from])
     puts
 
-    compare_resources(from, to)
+    compare_resources(from, to, options)
     nil
   end
 end
