@@ -72,9 +72,14 @@ module Comparer
 
   # Takes arrays of resource titles and shows the differences
   def print_resource_diffs(r1, r2)
-      result = r1.dup 
-      r2.each{|e| result.include?(e) ? result.delete(e) : result.push(e) }
-      result.each {|resource| puts "\t#{resource}"}
+      puts "Only in old:"
+      (r2 - r1).each do |r|
+        puts "\t#{r}"
+      end
+      puts "Only in new:"
+      (r1 - r2).each do |r|
+        puts "\t#{r}"
+      end
   end
 end
 end
