@@ -15,38 +15,38 @@ require 'puppet/catalog-diff/comparer'
 
 
 module Puppet::CatalogDiff
-class Differ
+  class Differ
 
-  include Puppet::CatalogDiff::Preprocessor
-  include Puppet::CatalogDiff::Comparer
+    include Puppet::CatalogDiff::Preprocessor
+    include Puppet::CatalogDiff::Comparer
 
-  attr_accessor :from_file, :to_file
+    attr_accessor :from_file, :to_file
 
-  def initialize(from, to)
-    @from_file = from
-    @to_file = to
+    def initialize(from, to)
+      @from_file = from
+      @to_file = to
 
-    check_version
-  end
+      check_version
+    end
 
-  def check_version
-    if Puppet.version =~ /^([0-9]+[.][0-9]+)[.][0-9]+/
+    def check_version
+      if Puppet.version =~ /^([0-9]+[.][0-9]+)[.][0-9]+/
         @version = $1
 
         unless ["0.24", "0.25", "2.6", "2.7", "3.0"].include?(@version)
-            raise "Don't know how to compare catalogs for version #{Puppet.version}. Only 0.24, 0.25, 2.6, 2.7 and 3.0 are supported"
+          raise "Don't know how to compare catalogs for version #{Puppet.version}. Only 0.24, 0.25, 2.6, 2.7 and 3.0 are supported"
         end
-    else
+      else
         raise "Could not figure out version from #{Puppet.version}"
+      end
     end
-  end
 
-  def diff(options = {})
-    from = []
-    to   = []
-    { from_file => from, to_file => to}.each do |r,v|
+    def diff(options = {})
+      from = []
+      to   = []
+      { from_file => from, to_file => to}.each do |r,v|
         unless File.exist?(r)
-            raise "Cannot find resources in #{r}"
+          raise "Cannot find resources in #{r}"
         end
 
         case File.extname(r)
@@ -63,23 +63,23 @@ class Differ
         else
           convert25(tmp, v)
         end
+      end
+
+      titles = {}
+      titles[:to] = extract_titles(to)
+      titles[:from] = extract_titles(from)
+
+      puts "Resource counts:"
+      puts "\tOld: #{titles[:from].size}"
+      puts "\tNew: #{titles[:to].size}"
+      puts
+
+      puts "Resource title diffs:"
+      print_resource_diffs(titles[:to], titles[:from])
+      puts
+
+      compare_resources(from, to, options)
+      nil
     end
-
-    titles = {}
-    titles[:to] = extract_titles(to)
-    titles[:from] = extract_titles(from)
-
-    puts "Resource counts:"
-    puts "\tOld: #{titles[:from].size}"
-    puts "\tNew: #{titles[:to].size}"
-    puts
-
-    puts "Resource title diffs:"
-    print_resource_diffs(titles[:to], titles[:from])
-    puts
-
-    compare_resources(from, to, options)
-    nil
   end
-end
 end
