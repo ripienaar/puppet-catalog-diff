@@ -1,13 +1,5 @@
-# A tool to compare catalogs that have been generated via puppet master --compile
-#
-# Contact:
-# R.I.Pienaar <rip@devco.net> - www.devco.net - @ripienaar
-
-################# start methods to generate intermediate format ################
-
 module Puppet::CatalogDiff
   module Preprocessor
-
     # capitalize a resource from ["class", "foo::bar"] to Class[Foo::Bar]
     #
     # Dear Puppet 0.24.  Die.
@@ -42,11 +34,11 @@ module Puppet::CatalogDiff
     # Converts Puppet 0.24 and possibly earlier catalogs
     # to our intermediate format
     def convert24(bucket, collector)
-      if bucket.class == Puppet::TransBucket
+      if bucket.is_a?(Puppet::TransBucket)
         bucket.each do |b|
           convert24(b, collector)
         end
-      elsif bucket.class == Puppet::TransObject
+      elsif bucket.is_a?(Puppet::TransObject)
         manifestfile = bucket.file.gsub("/etc/puppet/manifests/", "")
 
         resource = {:type => bucket.type,
@@ -95,11 +87,11 @@ module Puppet::CatalogDiff
 
     # Converts Puppet 0.25 and 2.6.x catalogs to our intermediate format
     def convert25(resource, collector)
-      if resource.class == Puppet::Resource::Catalog
+      if resource.is_a?(Puppet::Resource::Catalog)
         resource.edges.each do |b|
           convert25(b, collector)
         end
-      elsif resource.class == Puppet::Relationship and resource.target.class == Puppet::Resource and resource.target.title != nil and resource.target.file != nil
+      elsif resource.is_a?(Puppet::Relationship) and resource.target.is_a?(Puppet::Resource) and resource.target.title and resource.target.file
         target = resource.target
         manifestfile = target.file.gsub("/etc/puppet/manifests/", "")
 
@@ -121,5 +113,3 @@ module Puppet::CatalogDiff
     end
   end
 end
-
-################# end methods to generate intermediate format ##################

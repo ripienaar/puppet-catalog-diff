@@ -1,13 +1,9 @@
-# A tool to compare catalogs that have been generated via puppet master --compile
-#
-# Contact:
-# R.I.Pienaar <rip@devco.net> - www.devco.net - @ripienaar
-
 require 'yaml'
 require 'facter'
 require 'pp'
 require 'fileutils'
 require 'digest/md5'
+require 'tempfile'
 
 # helper methods
 require 'puppet/catalog-diff/preprocessor'
@@ -25,20 +21,6 @@ module Puppet::CatalogDiff
     def initialize(from, to)
       @from_file = from
       @to_file = to
-
-      check_version
-    end
-
-    def check_version
-      if Puppet.version =~ /^([0-9]+[.][0-9]+)[.][0-9]+/
-        @version = $1
-
-        unless ["0.24", "0.25", "2.6", "2.7", "3.0"].include?(@version)
-          raise "Don't know how to compare catalogs for version #{Puppet.version}. Only 0.24, 0.25, 2.6, 2.7 and 3.0 are supported"
-        end
-      else
-        raise "Could not figure out version from #{Puppet.version}"
-      end
     end
 
     def diff(options = {})

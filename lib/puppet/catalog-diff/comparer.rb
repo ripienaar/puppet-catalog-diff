@@ -1,15 +1,5 @@
-# A tool to compare catalogs that have been generated via puppet master --compile
-#
-# Contact:
-# R.I.Pienaar <rip@devco.net> - www.devco.net - @ripienaar
-
-################# start methods to compare intermediate format #################
-
-require 'tempfile'
-
 module Puppet::CatalogDiff
   module Comparer
-
     # Creates an array of just the resource titles
     # it would be records like file["/foo"]
     def extract_titles(resources)
@@ -110,5 +100,3 @@ module Puppet::CatalogDiff
     end
   end
 end
-
-################# end methods to compare intermediate format ###################
