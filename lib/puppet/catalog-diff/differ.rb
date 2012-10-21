@@ -6,9 +6,8 @@ require 'digest/md5'
 require 'tempfile'
 
 # helper methods
-require 'puppet/catalog-diff/preprocessor'
-require 'puppet/catalog-diff/comparer'
-
+require File.expand_path(File.join(File.dirname(__FILE__), 'preprocessor.rb'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'comparer.rb'))
 
 module Puppet::CatalogDiff
   class Differ

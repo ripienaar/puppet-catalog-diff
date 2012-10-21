@@ -1,5 +1,4 @@
 require 'puppet/face'
-require 'puppet/catalog-diff/differ'
 
 Puppet::Face.define(:catalog, '0.0.1') do
   action :diff do
@@ -26,9 +25,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
             puppet master --compile fqdn > fqdn.pson
 
+       - Puppet puts a header in some catalogs compiled in this way, remove it if present
        - At this point you should have 2 different catalogs. To compare them run:
 
-            diffcatalogs.rb <catalog1> <catalog2>
+            puppet catalog diff <catalog1> <catalog2>
 
 
       Example Output:
@@ -38,31 +38,31 @@ Puppet::Face.define(:catalog, '0.0.1') do
       in a tiny 2 resource catalog, the output below shows how this tool would
       have highlighted this bug prior to upgrading any nodes.
 
-      	Resource counts:
-      		Old: 2
-      		New: 2
+        Resource counts:
+          Old: 2
+          New: 2
 
-      	Catalogs contain the same resources by resource title
+        Catalogs contain the same resources by resource title
 
 
-      	Individual Resource differences:
-      	Old Resource:
-      	  file{"/tmp/foo":
-      		content => d3b07384d113edec49eaa6238ad5ff00
-      	  }
+        Individual Resource differences:
+        Old Resource:
+          file{"/tmp/foo":
+             content => d3b07384d113edec49eaa6238ad5ff00
+          }
 
-      	New Resource:
-      	  file{"/tmp/foo":
-      		content => dbb53f3699703c028483658773628452
-      	  }
+        New Resource:
+          file{"/tmp/foo":
+             content => dbb53f3699703c028483658773628452
+          }
 
-      Had resources imply gone missing - not the case here - you would have seen
+      Had resources simply gone missing - not the case here - you would have seen
       a list of that.
 
       This code only validates the catalogs, it cannot tell you if the behavior of
       the providers that interpret the catalog has changed so testing is still
       recommended, this is just one tool to take away some of the uncertainty
-    
+
     NOTES
     examples <<-'EOT'
       Compare host catalogs:
@@ -71,6 +71,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
     EOT
 
     when_invoked do |catalog1, catalog2, options|
+      require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "differ.rb"))
+
       Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
     end
   end

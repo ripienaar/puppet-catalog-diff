@@ -1,0 +1,8 @@
+name 'ripienaar-catalog_diff'
+version '0.2.0'
+source 'git://github.com/ripienaar/puppet-catalog-diff.git'
+author 'R.I.Pienaar'
+license 'Apache'
+summary 'Compares two catalogs and shows the differences'
+description 'Compares two catalogs and shows the differences'
+project_page 'http://github.com/ripienaar/puppet-catalog-diff'
