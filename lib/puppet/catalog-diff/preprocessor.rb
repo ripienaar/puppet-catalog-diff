@@ -76,7 +76,7 @@ module Puppet::CatalogDiff
           end
         end
 
-        if resource[:parameters].include?(:content)
+        if resource[:parameters].include?(:content) and resource[:parameters][:content] != false
           resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
         end
 
