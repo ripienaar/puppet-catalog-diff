@@ -14,7 +14,7 @@ module Puppet::CatalogDiff
 
     # Prints a resource in a way that looks like puppet code
     def print_resource(resource)
-      puts "\t" + resource[:type].downcase + '{"' +  resource[:title] + '":'
+      puts "\t" + resource[:type].downcase + '{"' +  resource[:title].to_s + '":'
       resource[:parameters].each_pair do |k,v|
         if v.is_a?(Array)
           indent = " " * k.to_s.size
