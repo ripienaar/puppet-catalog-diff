@@ -37,6 +37,8 @@ module Puppet::CatalogDiff
           tmp = Marshal.load(File.read(r))
         when '.pson'
           tmp = PSON.load(File.read(r))
+        when '.json'
+          tmp = PSON.load(File.read(r))
 	else 
 	  raise "Provide catalog with the approprtiate file extension, valid extensions are pson, yaml and marshal"
         end
