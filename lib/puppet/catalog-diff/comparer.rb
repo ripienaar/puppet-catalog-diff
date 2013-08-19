@@ -12,26 +12,33 @@ module Puppet::CatalogDiff
       titles
     end
 
-    # Prints a resource in a way that looks like puppet code
-    def print_resource(resource)
-      puts "\t" + resource[:type].downcase + '{"' +  resource[:title].to_s + '":'
+    # creates a string representation of a resource that looks like Puppet code
+    def resource_to_string(resource)
+      str = ''
+      str << "\t" + resource[:type].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
       resource[:parameters].each_pair do |k,v|
         if v.is_a?(Array)
           indent = " " * k.to_s.size
 
-          puts "\t     #{k} => ["
+          str << "\t     #{k} => [" << "\n"
           v.each do |val|
-            puts "\t     #{indent}     #{val},"
+            str << "\t     #{indent}     #{val}," << "\n"
           end
-          puts "\t     #{indent}    ]"
+          str << "\t     #{indent}    ]" << "\n"
         else
           if k == :content
             v = v[:checksum]
           end
-          puts "\t     #{k} => #{v}"
+          str << "\t     #{k} => #{v}" << "\n"
         end
       end
-      puts "\t}"
+      str << "\t}\n"
+
+    end
+
+    # Prints a resource in a way that looks like puppet code
+    def print_resource(resource)
+      puts resource_to_string(resource)
     end
 
     # Compares two sets of resources and prints the differences
@@ -56,13 +63,22 @@ module Puppet::CatalogDiff
         sort_dependencies!(resource[:parameters])
 
         unless new_resource[:parameters] == resource[:parameters]
-          puts "Old Resource:"
-          print_resource(resource)
+          if options[:show_resource_diff]
+            puts
+            puts "Resource diff: #{resource[:resource_id]}"
+            puts  str_diff(
+                    resource_to_string(resource),
+                    resource_to_string(new_resource)
+                  ).split("\n")[3..-1].join("\n")
+          else
+            puts "Old Resource:"
+            print_resource(resource)
 
-          puts
+            puts
 
-          puts "New Resource:"
-          print_resource(new_resource)
+            puts "New Resource:"
+            print_resource(new_resource)
+          end
 
           if options[:content_diff] && resource[:parameters][:content] && new_resource[:parameters][:content] && resource[:parameters][:content][:checksum] != new_resource[:parameters][:content][:checksum]
             puts

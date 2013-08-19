@@ -9,6 +9,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary "Whether to show a diff for File resource content"
     end
 
+    option '--show_resource_diff' do
+      summary 'Allows differneces between resources to specified using unified diff format'
+    end
+
     description <<-'EOT'
       Prints the differences between catalogs compiled by different puppet master to help
       during migrating to a new Puppet version.
