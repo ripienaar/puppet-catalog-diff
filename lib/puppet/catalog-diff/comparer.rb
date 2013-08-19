@@ -52,6 +52,9 @@ module Puppet::CatalogDiff
         #resource[:parameters].delete(:command) unless new_resource[:parameters].include?(:command)
         #resource[:parameters].delete(:path) unless new_resource[:parameters].include?(:path)
 
+        sort_dependencies!(new_resource[:parameters])
+        sort_dependencies!(resource[:parameters])
+
         unless new_resource[:parameters] == resource[:parameters]
           puts "Old Resource:"
           print_resource(resource)
@@ -72,6 +75,17 @@ module Puppet::CatalogDiff
         end
 
       end
+    end
+
+    # sort require/before/notify/subscribe before comparison
+    def sort_dependencies!(params)
+      params.each do |x|
+        if [:require, :before, :notify, :subscribe].include?(x[0])
+          if x[1].class == Array
+            x[1].sort!
+          end
+        end
+      end  
     end
 
     # Takes arrays of resource titles and shows the differences
