@@ -1,3 +1,4 @@
+require 'puppet/util/diff'
 module Puppet::CatalogDiff
   module Comparer
     # Creates an array of just the resource titles
@@ -66,10 +67,17 @@ module Puppet::CatalogDiff
           if options[:show_resource_diff]
             puts
             puts "Resource diff: #{resource[:resource_id]}"
-            puts  str_diff(
-                    resource_to_string(resource),
-                    resource_to_string(new_resource)
-                  ).split("\n")[3..-1].join("\n")
+            diff_array = str_diff(
+                           resource_to_string(resource),
+                           resource_to_string(new_resource)
+                         ).split("\n")
+            if diff_array.size >= 3
+              puts diff_array[3..-1].join("\n")
+            else
+              puts 'Could not automatically detect diff'
+              puts resource[:parameters].inspect
+              puts new_resource[:parameters].inspect
+            end
           else
             puts "Old Resource:"
             print_resource(resource)
@@ -101,7 +109,7 @@ module Puppet::CatalogDiff
             x[1].sort!
           end
         end
-      end  
+      end
     end
 
     # Takes arrays of resource titles and shows the differences
