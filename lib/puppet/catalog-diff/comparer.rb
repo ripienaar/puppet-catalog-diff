@@ -1,3 +1,4 @@
+require 'puppet/util/diff'
 module Puppet::CatalogDiff
   module Comparer
     # Creates an array of just the resource titles
