@@ -10,7 +10,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
     end
 
     option '--show_resource_diff' do
-      summary 'Allows differneces between resources to specified using unified diff format'
+      summary 'Display differeces between resources in unified diff format'
+    end
+
+    option '--exclude_classes' do
+      summary 'Do not print classes in resource diffs'
     end
 
     description <<-'EOT'

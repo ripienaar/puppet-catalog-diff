@@ -50,6 +50,12 @@ module Puppet::CatalogDiff
         end
       end
 
+      if options[:exclude_classes]
+        [to, from].each do |x|
+          x.reject! {|x| x[:type] == 'Class' }
+        end
+      end 
+
       titles = {}
       titles[:to] = extract_titles(to)
       titles[:from] = extract_titles(from)
