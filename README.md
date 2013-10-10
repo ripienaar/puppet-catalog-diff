@@ -1,6 +1,6 @@
 What?
 =====
-A tool to compare 2 Puppet catalogs.
+A tool to compare two Puppet catalogs.
 
 While upgrading versions of Puppet or refactoring Puppet code you want to
 ensure that no unexpected changes will be made prior to doing the upgrade.
@@ -24,7 +24,7 @@ Validation Process:
       puppet master --compile fqdn > fqdn.pson
 
  - Puppet puts a header in some catalogs compiled in this way, remove it if present
- - At this point you should have 2 different catalogs. To compare them run:
+ - At this point you should have two different catalogs. To compare them run:
 
       puppet catalog diff <catalog1> <catalog2>
 
@@ -53,12 +53,12 @@ this bug prior to upgrading any nodes.
         content => dbb53f3699703c028483658773628452
       }
 
-Had resources imply gone missing - not the case here - you would have seen a
+Had resources simply gone missing - not the case here - you would have seen a
 list of that.
 
 This code only validates the catalogs, it cannot tell you if the behavior of
 the providers that interpret the catalog has changed so testing is still
-recommended, this is just one tool to take away some of the uncertainty
+recommended, this is just one tool to take away some of the uncertainty.
 
 You can get some inline help with:
 
