@@ -113,15 +113,19 @@ module Puppet::CatalogDiff
     end
 
     # Takes arrays of resource titles and shows the differences
-    def print_resource_diffs(r1, r2)
-      puts "Only in old:"
+    def return_resource_diffs(r1, r2)
+      only_in_old = []
       (r2 - r1).each do |r|
-        puts "\t#{r}"
+        only_in_old << "#{r}"
       end
-      puts "Only in new:"
+      only_in_new = []
       (r1 - r2).each do |r|
-        puts "\t#{r}"
+        only_in_new << "#{r}"
       end
+      differences = { 
+        'only_in_old' => only_in_old,
+        'only_in_new' => only_in_new,
+      }
     end
 
     def str_diff(str1, str2)

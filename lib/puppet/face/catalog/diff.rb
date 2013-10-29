@@ -83,5 +83,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
     end
+
+    when_rendering :console do |output|
+      output.each do |header|
+        "#{header}"
+      end
+    end
   end
 end
