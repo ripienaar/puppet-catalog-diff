@@ -37,7 +37,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
        - At this point you should have 2 different catalogs. To compare them run:
 
             puppet catalog diff <catalog1> <catalog2>
-
+       - Alternatively you can process a directory containing matching files
+       - i.e. path/to/old/node_name.yaml and path/to/new/node_name.yaml
+                   puppet catalog diff <path/to/old> <path/to/new>
 
       Example Output:
 
@@ -76,6 +78,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       Compare host catalogs:
 
       $ puppet catalog diff host-2.6.yaml host-3.0.pson
+      $ puppet catalog diff /tmp/old_catalogs /tmp/new_catalogs
     EOT
 
     when_invoked do |catalog1, catalog2, options|

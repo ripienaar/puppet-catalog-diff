@@ -28,6 +28,10 @@ Validation Process:
 
       puppet catalog diff <catalog1> <catalog2>
 
+ - Alternatively you can process a directory containing matching files
+ - i.e. path/to/old/node_name.yaml and path/to/new/node_name.yaml
+      puppet catalog diff <path/to/old> <path/to/new>
+
 Example Output:
 
 During the transition of 0.24.x to 0.25.x there was a serialization bug that
