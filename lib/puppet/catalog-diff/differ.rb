@@ -74,6 +74,7 @@ module Puppet::CatalogDiff
       }
       if options[:show_resource_diff]
         compare_resources(from, to, options)
+      end
       output
     end
   end
