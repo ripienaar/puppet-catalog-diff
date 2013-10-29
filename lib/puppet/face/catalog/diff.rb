@@ -80,8 +80,17 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     when_invoked do |catalog1, catalog2, options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "differ.rb"))
-
-      Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+      require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "findcatalogs.rb"))
+      nodes = {}
+      if File.directory?(catalog1) && File.directory?(catalog2)
+        found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
+        found_catalogs.each do |old_catalog,new_catalog|
+          nodes[new_catalog] = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
+        end
+      else
+        nodes[catalog1] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+      end
+      nodes
     end
 
     when_rendering :console do |output|
