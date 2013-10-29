@@ -84,11 +84,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
       nodes = {}
       if File.directory?(catalog1) && File.directory?(catalog2)
         found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
+
         found_catalogs.each do |old_catalog,new_catalog|
-          nodes[new_catalog] = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
+          node_name = File.basename(new_catalog,File.extname(new_catalog))
+          nodes[node_name] = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
         end
       else
-        nodes[catalog1] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+        node_name = File.basename(catalog2,File.extname(catalog2))
+        nodes[node_name] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
       end
       nodes
     end
