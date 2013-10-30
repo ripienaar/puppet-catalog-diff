@@ -52,6 +52,8 @@ module Puppet::CatalogDiff
       differences_in_old = {}
       differences_in_new = {}
       string_differences = {}
+      parameters_in_old = {}
+      parameters_in_new = {}
       old.each do |resource|
         new_resource = new.find{|res| res[:resource_id] == resource[:resource_id]}
         next if new_resource.nil?
@@ -68,6 +70,12 @@ module Puppet::CatalogDiff
         sort_dependencies!(resource[:parameters])
 
         unless new_resource[:parameters] == resource[:parameters]
+          parameters_in_old[resource[:resource_id]] = \
+          Hash[*(new_resource[:parameters].to_a - resource[:parameters].to_a ).flatten]
+
+          parameters_in_new[resource[:resource_id]] = \
+          Hash[*(resource[:parameters].to_a - new_resource[:parameters].to_a ).flatten]
+
           if options[:show_resource_diff]
             Puppet.debug("Resource diff: #{resource[:resource_id]}")
 
@@ -104,6 +112,8 @@ module Puppet::CatalogDiff
       resource_differences['old'] = differences_in_old
       resource_differences['new'] = differences_in_new
       resource_differences['string_diffs'] = string_differences
+      resource_differences['old_params']  = parameters_in_old
+      resource_differences['new_params']  = parameters_in_new
       resource_differences
     end
 
