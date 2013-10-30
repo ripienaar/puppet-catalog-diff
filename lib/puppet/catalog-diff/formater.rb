@@ -6,9 +6,8 @@ module Puppet::CatalogDiff
 
     # creates a string representation of a resource that looks like Puppet code
     def resource_to_string(resource)
-      Puppet.debug("Passed a #{resource.class} with value #{resource} type is #{resource['type']}")
       str = ''
-      str << "\t" + resource['type'].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
+      str << "\t" + resource[:type].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
       resource[:parameters].each_pair do |k,v|
         if v.is_a?(Array)
           indent = " " * k.to_s.size

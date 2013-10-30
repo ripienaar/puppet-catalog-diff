@@ -101,18 +101,23 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       nodes.collect do |node,summary|
-          Puppet.debug("node is #{node} of type #{node.class}")
-          Puppet.debug("summary for #{node} is #{summary} and of type #{summary.class}")
-          summary.each do |header,value|
-            Puppet.debug("Header is #{header} of type #{header.class}")
+          "\n#{node}" + summary.collect do |header,value|
             if value.is_a?(Hash)
-              Puppet.debug("Value is #{value}")
-              resource = Puppet::CatalogDiff::Formater.new().resource_to_string(value)
-              "#{resource}"
+              value.collect do |resource_id,resource|
+                # If we find an actual resource print it out
+                if resource.has_key?(:type)
+                  dsl = Puppet::CatalogDiff::Formater.new().resource_to_string(resource)
+                  "#{header.gsub("_"," ").capitalize}:\n\t#{resource_id}:\n\n#{dsl}"
+                else
+                  params = resource.collect do |k,v|
+                    "#{k} = #{v}"
+                  end.join("\n")
+                  "#{header.gsub("_"," ").capitalize}:\n\t#{resource_id}:\n\t#{params}"
+                end
+              end
             end
-
-          end
-      end.sort.join("\n")
+          end.join("\n")
+      end.join("\n")
     end
   end
 end
