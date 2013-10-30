@@ -101,20 +101,35 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       nodes.collect do |node,summary|
-          "\n#{node}" + summary.collect do |header,value|
+          "#{"-" * 80}\n\033[1m#{node}\033[0m\n#{"-" * 80}\n" + summary.collect do |header,value|
             if value.is_a?(Hash)
               value.collect do |resource_id,resource|
                 # If we find an actual resource print it out
-                if resource.has_key?(:type)
+                if resource.is_a?(Hash) && resource.has_key?(:type)
                   dsl = Puppet::CatalogDiff::Formater.new().resource_to_string(resource)
-                  "#{header.gsub("_"," ").capitalize}:\n\t#{resource_id}:\n\n#{dsl}"
+                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n\n#{dsl}"
+                elsif resource.is_a?(Array)
+                  # Format string diffs
+                  list = "\t#{resource_id}\n" + resource.collect do |k|
+                    "#{k}"
+                  end.join("\n")
+                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n#{list}"
                 else
+                  # Format hash diffs
                   params = resource.collect do |k,v|
                     "#{k} = #{v}"
                   end.join("\n")
-                  "#{header.gsub("_"," ").capitalize}:\n\t#{resource_id}:\n\t#{params}"
+                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n\t#{params}"
                 end
               end
+            elsif value.is_a?(Array)
+              next unless value.any?
+              list = value.collect do |k|
+                "\t#{k}"
+              end.join("\n")
+              "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n#{list}"
+            else
+              "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\t#{value}"
             end
           end.join("\n")
       end.join("\n")

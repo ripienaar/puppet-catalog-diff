@@ -51,8 +51,8 @@ module Puppet::CatalogDiff
             Puppet.debug("Resource diff: #{resource[:resource_id]}")
 
             diff_array = str_diff(
-                           resource_to_string(resource),
-                           resource_to_string(new_resource)
+                           Puppet::CatalogDiff::Formater.new().resource_to_string(resource),
+                           Puppet::CatalogDiff::Formater.new().resource_to_string(new_resource)
                          ).split("\n")
             if diff_array.size >= 3
               string_differences[resource[:resource_id]] = diff_array[3..-1]
@@ -107,10 +107,11 @@ module Puppet::CatalogDiff
       (r1 - r2).each do |r|
         only_in_new << "#{r}"
       end
-      differences = { 
-        'old' => only_in_old,
-        'new' => only_in_new,
+      differences = {
+        'titles_only_in_old' => only_in_old,
+        'titles_only_in_new' => only_in_new,
       }
+      differences
     end
 
     def str_diff(str1, str2)

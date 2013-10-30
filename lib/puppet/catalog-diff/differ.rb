@@ -8,7 +8,7 @@ require 'tempfile'
 # helper methods
 require File.expand_path(File.join(File.dirname(__FILE__), 'preprocessor.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'comparer.rb'))
-
+require File.expand_path(File.join(File.dirname(__FILE__), 'formater.rb'))
 module Puppet::CatalogDiff
   class Differ
 
@@ -65,8 +65,8 @@ module Puppet::CatalogDiff
       output['total_in_new'] = titles[:to].size
 
       resource_diffs_titles = return_resource_diffs(titles[:to], titles[:from])
-      output['only_in_old'] = resource_diffs_titles['old']
-      output['only_in_new'] = resource_diffs_titles['new']
+      output['only_in_old'] = resource_diffs_titles['titles_only_in_old']
+      output['only_in_new'] = resource_diffs_titles['titles_only_in_new']
 
       resource_diffs = compare_resources(from, to, options)
       output['differences_in_old']  = resource_diffs['old']
