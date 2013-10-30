@@ -30,7 +30,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
       nodes.each do |node_name|
         unless catalog = Puppet::Resource::Catalog.indirection.find(node_name)
-          raise "Could not compile catalog for #{options[:node]}"
+          raise "Could not compile catalog for #{node_name}"
         end
         catalog = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
         Puppet.notice(catalog)
