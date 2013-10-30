@@ -7,7 +7,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     arguments "<path/to/seed/directory>"
 
     option "--puppetdb" do
-      summary "retreive node list from puppetdb"
+      summary "Not implemented:  retreive node list from puppetdb"
     end
 
     description <<-'EOT'
@@ -20,7 +20,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     NOTES
     examples <<-'EOT'
-      Compare host catalogs:
+      Dump host catalogs:
 
       $ puppet catalog seed /tmp/old_catalogs 'virtual=virtualbox'
     EOT
