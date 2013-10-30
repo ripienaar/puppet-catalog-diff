@@ -13,35 +13,6 @@ module Puppet::CatalogDiff
       titles
     end
 
-    # creates a string representation of a resource that looks like Puppet code
-    def resource_to_string(resource)
-      str = ''
-      str << "\t" + resource[:type].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
-      resource[:parameters].each_pair do |k,v|
-        if v.is_a?(Array)
-          indent = " " * k.to_s.size
-
-          str << "\t     #{k} => [" << "\n"
-          v.each do |val|
-            str << "\t     #{indent}     #{val}," << "\n"
-          end
-          str << "\t     #{indent}    ]" << "\n"
-        else
-          if k == :content
-            v = v[:checksum]
-          end
-          str << "\t     #{k} => #{v}" << "\n"
-        end
-      end
-      str << "\t}\n"
-
-    end
-
-    # Prints a resource in a way that looks like puppet code
-    def print_resource(resource)
-      puts resource_to_string(resource)
-    end
-
     # Compares two sets of resources and prints the differences
     # if the two sets do not include the same resource counts
     # this will only print the resources available in both
@@ -91,10 +62,8 @@ module Puppet::CatalogDiff
             end
 
           else
-            #print_resource(resource)
             differences_in_old[resource[:resource_id]] = resource
 
-            #print_resource(new_resource)
             differences_in_new[resource[:resource_id]] = new_resource
           end
 

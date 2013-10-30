@@ -1,6 +1,6 @@
 require 'puppet/face'
-
 Puppet::Face.define(:catalog, '0.0.1') do
+
   action :diff do
     summary "Compare catalogs from different puppet versions."
     arguments "<catalog1> <catalog2>"
@@ -98,13 +98,21 @@ Puppet::Face.define(:catalog, '0.0.1') do
       end
       nodes
     end
+    when_rendering :console do |nodes|
+      require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
+      nodes.collect do |node,summary|
+          Puppet.debug("node is #{node} of type #{node.class}")
+          Puppet.debug("summary for #{node} is #{summary} and of type #{summary.class}")
+          summary.each do |header,value|
+            Puppet.debug("Header is #{header} of type #{header.class}")
+            if value.is_a?(Hash)
+              Puppet.debug("Value is #{value}")
+              resource = Puppet::CatalogDiff::Formater.new().resource_to_string(value)
+              "#{resource}"
+            end
 
-    render_as :pson
-
-    #when_rendering :console do |output|
-    #  output.each do |header|
-    #    "#{header}"
-    #  end
-    #end
+          end
+      end.sort.join("\n")
+    end
   end
 end
