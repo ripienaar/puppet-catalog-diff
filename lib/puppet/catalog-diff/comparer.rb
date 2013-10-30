@@ -123,8 +123,8 @@ module Puppet::CatalogDiff
         only_in_new << "#{r}"
       end
       differences = { 
-        'only_in_old' => only_in_old,
-        'only_in_new' => only_in_new,
+        'old' => only_in_old,
+        'new' => only_in_new,
       }
     end
 
