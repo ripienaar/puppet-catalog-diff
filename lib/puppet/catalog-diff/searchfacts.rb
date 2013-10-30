@@ -5,7 +5,7 @@ module Puppet::CatalogDiff
 
     def initialize(args)
       @args = args
-      @host = Puppet[:server]
+      @host = 'localhost'
       @port = '8140'
     end
 

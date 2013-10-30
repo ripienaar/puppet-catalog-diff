@@ -5,8 +5,10 @@ module Puppet::CatalogDiff
         def initialize(host, port, user, password, ssl=false)
             @user = user
             @password = password
-            opts = {use_ssl => ssl, verify_mode => OpenSSL::SSL::VERIFY_NONE}
-            res = Net::HTTP.start(host, port, opts) do |http|
+            session = Net::HTTP.new(host, port)
+            session.use_ssl = ssl
+            session.verify_mode  = OpenSSL::SSL::VERIFY_NONE
+            res = session.start do |http|
                 @http = http
                 yield self
             end

@@ -34,7 +34,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
         end
         catalog = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
         Puppet.notice(catalog)
-        File.write("#{save_directory}/#{node_name}.pson", catalog)
+        File.open("#{save_directory}/#{node_name}.pson","w") do |f|
+          f.write(catalog)
+        end
       end
     end
 
