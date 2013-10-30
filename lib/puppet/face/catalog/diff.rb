@@ -110,6 +110,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
                   "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n\n#{dsl}"
                 elsif resource.is_a?(Array)
                   # Format string diffs
+                  next unless resource.any?
                   list = "\t#{resource_id}\n" + resource.collect do |k|
                     "#{k}"
                   end.join("\n")
