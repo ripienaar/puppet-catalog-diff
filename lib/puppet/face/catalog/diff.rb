@@ -99,10 +99,12 @@ Puppet::Face.define(:catalog, '0.0.1') do
       nodes
     end
 
-    when_rendering :console do |output|
-      output.each do |header|
-        "#{header}"
-      end
-    end
+    render_as :pson
+
+    #when_rendering :console do |output|
+    #  output.each do |header|
+    #    "#{header}"
+    #  end
+    #end
   end
 end
