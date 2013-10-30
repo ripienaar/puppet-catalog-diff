@@ -46,8 +46,12 @@ module Puppet::CatalogDiff
     # if the two sets do not include the same resource counts
     # this will only print the resources available in both
     def compare_resources(old, new, options)
-      puts "Individual Resource differences:"
+      Puppet.debug("Individual Resource differences:")
 
+      resource_differences = {}
+      differences_in_old = {}
+      differences_in_new = {}
+      string_differences = {}
       old.each do |resource|
         new_resource = new.find{|res| res[:resource_id] == resource[:resource_id]}
         next if new_resource.nil?
@@ -65,27 +69,25 @@ module Puppet::CatalogDiff
 
         unless new_resource[:parameters] == resource[:parameters]
           if options[:show_resource_diff]
-            puts
-            puts "Resource diff: #{resource[:resource_id]}"
+            Puppet.debug("Resource diff: #{resource[:resource_id]}")
+
             diff_array = str_diff(
                            resource_to_string(resource),
                            resource_to_string(new_resource)
                          ).split("\n")
             if diff_array.size >= 3
-              puts diff_array[3..-1].join("\n")
+              string_differences[resource[:resource_id]] = diff_array[3..-1]
             else
-              puts 'Could not automatically detect diff'
-              puts resource[:parameters].inspect
-              puts new_resource[:parameters].inspect
+              Puppet.debug('Could not automatically detect diff')
+              string_differences[resource[:resource_id]] = resource[:parameters].inspect + new_resource[:parameters].inspect
             end
+
           else
-            puts "Old Resource:"
-            print_resource(resource)
+            #print_resource(resource)
+            differences_in_old[resource[:resource_id]] = resource
 
-            puts
-
-            puts "New Resource:"
-            print_resource(new_resource)
+            #print_resource(new_resource)
+            differences_in_new[resource[:resource_id]] = new_resource
           end
 
           if options[:content_diff] && resource[:parameters][:content] && new_resource[:parameters][:content] && resource[:parameters][:content][:checksum] != new_resource[:parameters][:content][:checksum]
@@ -99,6 +101,10 @@ module Puppet::CatalogDiff
         end
 
       end
+      resource_differences['old'] = differences_in_old
+      resource_differences['new'] = differences_in_new
+      resource_differences['string_diffs'] = string_differences
+      resource_differences
     end
 
     # sort require/before/notify/subscribe before comparison

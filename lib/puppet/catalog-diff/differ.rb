@@ -68,9 +68,10 @@ module Puppet::CatalogDiff
       output['only_in_old'] = resource_diffs['old']
       output['only_in_new'] = resource_diffs['new']
 
-      if options[:show_resource_diff]
-        compare_resources(from, to, options)
-      end
+      resource_diffs = compare_resources(from, to, options)
+      output['differences_in_old'] = resource_diffs['old']
+      output['differences_in_new'] = resource_diffs['new']
+      output['string_differences'] = resource_diffs['string_diffs']
       output
     end
   end
