@@ -13,7 +13,7 @@ module Puppet::CatalogDiff
       Dir.glob("#{catalog_path}/*.{yaml,marshal,pson,json}") do |catalog_file|
         found_catalogs << catalog_file
       end
-      Puppet.notice("Found catalogs #{found_catalogs.size} in #{catalog_path}")
+      Puppet.debug("Found catalogs #{found_catalogs.size} in #{catalog_path}")
       found_catalogs
     end
 
