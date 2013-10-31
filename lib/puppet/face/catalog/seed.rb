@@ -1,4 +1,5 @@
 require 'puppet/face'
+require 'thread'
 require 'puppet/application/master'
 
 Puppet::Face.define(:catalog, '0.0.1') do
@@ -27,30 +28,25 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     when_invoked do |save_directory,args,options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "searchfacts.rb"))
-      # If the args contains a fact search then assume its not a node
+      require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "compilecatalog.rb"))
+      # If the args contains a fact search then assume its not a node_name
       if args =~ /.*=.*/
         nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
       else
         nodes = args.split(',')
       end
-      nodes.each do |node_name|
-        # Compile the catalog with the last environment used according to the yaml terminus
-        # The following is a hack as I can't pass :mode => master in the 2.7 series
-        Puppet[:clientyamldir] = Puppet[:yamldir]
-        unless env = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
-          raise "Could not find yaml file for node #{node_name}"
-        end
-        Puppet.debug("Found environment #{env} for node #{node_name}")
+      THREAD_COUNT = 1
+      compiled_nodes = []
+      mutex = Mutex.new
 
-        unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => env)
-          raise "Could not compile catalog for #{node_name}"
+      THREAD_COUNT.times.map {
+        Thread.new(nodes,compiled_nodes) do |nodes,compiled_nodes|
+          while node_name = mutex.synchronize { nodes.pop }
+            compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
+            mutex.synchronize { compiled_nodes << compiled }
+          end
         end
-
-        catalog = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
-        File.open("#{save_directory}/#{node_name}.pson","w") do |f|
-          f.write(catalog)
-        end
-      end
+      }.each(&:join)
     end
 
     when_rendering :console do |output|
