@@ -110,7 +110,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
                 # If we find an actual resource print it out
                 if resource.is_a?(Hash) && resource.has_key?(:type)
                   dsl = Puppet::CatalogDiff::Formater.new().resource_to_string(resource)
-                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n\n#{dsl}"
+                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n\n#{dsl}"
                 elsif resource.is_a?(Array)
                   # Format string diffs
                   next unless resource.any?
