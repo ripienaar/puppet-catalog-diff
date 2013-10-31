@@ -28,12 +28,18 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_invoked do |save_directory,args,options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "searchfacts.rb"))
       nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
+
       nodes.each do |node_name|
-        unless catalog = Puppet::Resource::Catalog.indirection.find(node_name)
+
+        # Compile the catalog with the last environment used according to the yaml terminus
+        env = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
+        Puppet.debug("Found environment #{env} for node #{node_name}")
+
+        unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => env)
           raise "Could not compile catalog for #{node_name}"
         end
+
         catalog = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
-        Puppet.notice(catalog)
         File.open("#{save_directory}/#{node_name}.pson","w") do |f|
           f.write(catalog)
         end
