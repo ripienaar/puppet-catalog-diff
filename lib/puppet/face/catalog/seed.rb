@@ -32,7 +32,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
       nodes.each do |node_name|
 
         # Compile the catalog with the last environment used according to the yaml terminus
-        env = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
+        unless env = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
+          raise "Could not find yaml file for node #{node_name}"
+        end
         Puppet.debug("Found environment #{env} for node #{node_name}")
 
         unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => env)
