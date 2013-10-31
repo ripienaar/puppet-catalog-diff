@@ -102,8 +102,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       nodes.collect do |node,summary|
           "#{"-" * 80}\n\033[1m#{node}\033[0m\n#{"-" * 80}\n" + summary.collect do |header,value|
+            next if value.nil?
             if value.is_a?(Hash)
               value.collect do |resource_id,resource|
+                next if resource.nil?
                 # If we find an actual resource print it out
                 if resource.is_a?(Hash) && resource.has_key?(:type)
                   dsl = Puppet::CatalogDiff::Formater.new().resource_to_string(resource)
