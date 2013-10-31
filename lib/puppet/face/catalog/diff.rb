@@ -101,7 +101,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       nodes.collect do |node,summary|
-          "#{"-" * 80}\n\033[1m#{node}\033[0m\n#{"-" * 80}\n" + summary.collect do |header,value|
+          header_spacing = ' ' * (79 - (node.length + summary['total_changes'].length)).to_i
+          "#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary['total_changes']}% \033[0m\n#{"-" * 80}\n" + summary.collect do |header,value|
             next if value.nil?
             if value.is_a?(Hash)
               value.collect do |resource_id,resource|
