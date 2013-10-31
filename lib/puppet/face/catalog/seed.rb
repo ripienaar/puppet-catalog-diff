@@ -30,8 +30,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
       nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
 
       nodes.each do |node_name|
-
         # Compile the catalog with the last environment used according to the yaml terminus
+        # The following is a hack as I can't pass :mode => master in the 2.7 series
+        Puppet[:clientyamldir] = Puppet[:yamldir]
         unless env = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
           raise "Could not find yaml file for node #{node_name}"
         end
