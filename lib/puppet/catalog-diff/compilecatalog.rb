@@ -10,11 +10,11 @@ module Puppet::CatalogDiff
       # Compile the catalog with the last environment used according to the yaml terminus
       # The following is a hack as I can't pass :mode => master in the 2.7 series
       Puppet[:clientyamldir] = Puppet[:yamldir]
-      unless environment = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' ).environment
+      unless node = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' )
         raise "Could not find yaml file for node #{node_name}"
       end
-      Puppet.debug("Found environment #{environment} for node #{node_name}")
-      environment
+      Puppet.debug("Found environment #{node.environment} for node #{node_name}")
+      node.environment
     end
     def compile_catalog(node_name)
       environment = lookup_environment(node_name)
