@@ -76,13 +76,19 @@ module Puppet::CatalogDiff
       output['params_in_old']       = resource_diffs['old_params']
       output['params_in_new']       = resource_diffs['new_params']
 
-      additions = resource_diffs['new_params'].keys.size
+      additions    = resource_diffs_titles['titles_only_in_new'].size
       subtractions = resource_diffs_titles['titles_only_in_old'].size
+      changes_percentage      = 100*(resource_diffs['new_params'].keys.size.to_f / titles[:from].size.to_f)
+      additions_percentage    = 100*(additions.abs.to_f / titles[:to].size.to_f)
+      subtractions_percentage = 100*(subtractions.abs.to_f / titles[:from].size.to_f)
 
-      additions_percentage = (!additions.zero?  && 100*(titles[:from].size - additions)/titles[:from].size || 0)
-      subtractions_percentage = (!subtractions.zero?  && 100*(titles[:from].size - subtractions)/titles[:from].size || 0)
-      output['change_metric'] = additions_percentage + subtractions_percentage / 100
-      output['resource_changes'] = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
+
+
+      output['percentage_added']   = '%.2f' % additions_percentage
+      output['percentage_removed'] = '%.2f' % subtractions_percentage
+      output['percentage_changed'] = '%.2f' % changes_percentage
+      output['resource_changes']   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
+      output['total_changes']      = "#{((changes_percentage + additions_percentage + subtractions_percentage) / 3).round.to_s}%"
       output
     end
   end
