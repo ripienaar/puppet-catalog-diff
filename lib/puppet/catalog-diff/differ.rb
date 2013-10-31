@@ -64,8 +64,6 @@ module Puppet::CatalogDiff
       output['total_in_old'] = titles[:from].size
       output['total_in_new'] = titles[:to].size
 
-      overall_change = titles[:from].size - titles[:to].size
-      output['changes'] = "#{overall_change}%"
 
       resource_diffs_titles = return_resource_diffs(titles[:to], titles[:from])
       output['only_in_old'] = resource_diffs_titles['titles_only_in_old']
@@ -77,6 +75,7 @@ module Puppet::CatalogDiff
       output['differences_as_diff'] = resource_diffs['string_diffs']
       output['params_in_old']       = resource_diffs['old_params']
       output['params_in_new']       = resource_diffs['new_params']
+
       output
     end
   end
