@@ -27,8 +27,12 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     when_invoked do |save_directory,args,options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "searchfacts.rb"))
-      nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
-
+      # If the args contains a fact search then assume its not a node
+      if args =~ /.*=.*/
+        nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
+      else
+        nodes = args.split(',')
+      end
       nodes.each do |node_name|
         # Compile the catalog with the last environment used according to the yaml terminus
         # The following is a hack as I can't pass :mode => master in the 2.7 series
