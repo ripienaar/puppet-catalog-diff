@@ -16,6 +16,7 @@ module Puppet::CatalogDiff
       Puppet.debug("Found environment #{node.environment} for node #{node_name}")
       node.environment
     end
+
     def compile_catalog(node_name)
       environment = lookup_environment(node_name)
       unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => environment)
@@ -23,16 +24,19 @@ module Puppet::CatalogDiff
       end
       catalog
     end
+
     def render_pson(catalog)
       unless pson = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
        raise "Could not render catalog as pson, #{catalog}"
       end
       pson
     end
+
     def save_catalog_to_disk(save_directory,node_name,catalog)
       File.open("#{save_directory}/#{node_name}.pson","w") do |f|
         f.write(catalog)
       end
     end
+
   end
 end
