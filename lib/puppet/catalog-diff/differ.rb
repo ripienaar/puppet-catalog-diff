@@ -63,34 +63,34 @@ module Puppet::CatalogDiff
       titles[:from] = extract_titles(from)
 
       output = {}
-      output['total_in_old'] = titles[:from].size
-      output['total_in_new'] = titles[:to].size
+      output[:total_in_old] = titles[:from].size
+      output[:total_in_new] = titles[:to].size
 
 
       resource_diffs_titles = return_resource_diffs(titles[:to], titles[:from])
-      output['only_in_old'] = resource_diffs_titles['titles_only_in_old']
-      output['only_in_new'] = resource_diffs_titles['titles_only_in_new']
+      output[:only_in_old] = resource_diffs_titles[:titles_only_in_old]
+      output[:only_in_new] = resource_diffs_titles[:titles_only_in_new]
 
       resource_diffs = compare_resources(from,to,options)
-      output['differences_in_old']  = resource_diffs['old']
-      output['differences_in_new']  = resource_diffs['new']
-      output['differences_as_diff'] = resource_diffs['string_diffs']
-      output['params_in_old']       = resource_diffs['old_params']
-      output['params_in_new']       = resource_diffs['new_params']
+      output[:differences_in_old]  = resource_diffs[:old]
+      output[:differences_in_new]  = resource_diffs[:new]
+      output[:differences_as_diff] = resource_diffs[:string_diffs]
+      output[:params_in_old]       = resource_diffs[:old_params]
+      output[:params_in_new]       = resource_diffs[:new_params]
 
-      additions    = resource_diffs_titles['titles_only_in_new'].size
-      subtractions = resource_diffs_titles['titles_only_in_old'].size
-      changes_percentage      = 100*(resource_diffs['new_params'].keys.size.to_f / titles[:from].size.to_f)
+      additions    = resource_diffs_titles[:titles_only_in_new].size
+      subtractions = resource_diffs_titles[:titles_only_in_old].size
+      changes_percentage      = 100*(resource_diffs[:new_params].keys.size.to_f / titles[:from].size.to_f)
       additions_percentage    = 100*(additions.abs.to_f / titles[:to].size.to_f)
       subtractions_percentage = 100*(subtractions.abs.to_f / titles[:from].size.to_f)
 
 
 
-      output['percentage_added']   = '%.2f' % additions_percentage
-      output['percentage_removed'] = '%.2f' % subtractions_percentage
-      output['percentage_changed'] = '%.2f' % changes_percentage
-      output['resource_changes']   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
-      output['total_percentage']      = ((changes_percentage + additions_percentage + subtractions_percentage) / 3).round.to_s
+      output[:percentage_added]   = '%.2f' % additions_percentage
+      output[:percentage_removed] = '%.2f' % subtractions_percentage
+      output[:percentage_changed] = '%.2f' % changes_percentage
+      output[:resource_changes]   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
+      output[:total_percentage]      = ((changes_percentage + additions_percentage + subtractions_percentage) / 3).round.to_s
       output
     end
   end

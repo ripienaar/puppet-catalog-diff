@@ -76,11 +76,11 @@ module Puppet::CatalogDiff
         end
 
       end
-      resource_differences['old'] = differences_in_old
-      resource_differences['new'] = differences_in_new
-      resource_differences['string_diffs'] = string_differences
-      resource_differences['old_params']  = parameters_in_old
-      resource_differences['new_params']  = parameters_in_new
+      resource_differences[:old] = differences_in_old
+      resource_differences[:new] = differences_in_new
+      resource_differences[:string_diffs] = string_differences
+      resource_differences[:old_params]  = parameters_in_old
+      resource_differences[:new_params]  = parameters_in_new
       resource_differences
     end
 
@@ -106,8 +106,8 @@ module Puppet::CatalogDiff
         only_in_new << "#{r}"
       end
       differences = {
-        'titles_only_in_old' => only_in_old,
-        'titles_only_in_new' => only_in_new,
+        :titles_only_in_old => only_in_old,
+        :titles_only_in_new => only_in_new,
       }
       differences
     end
