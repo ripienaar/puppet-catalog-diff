@@ -17,8 +17,6 @@ module Puppet::CatalogDiff
     # if the two sets do not include the same resource counts
     # this will only print the resources available in both
     def compare_resources(old, new, options)
-      Puppet.debug("Individual Resource differences:")
-
       resource_differences = {}
       differences_in_old = {}
       differences_in_new = {}

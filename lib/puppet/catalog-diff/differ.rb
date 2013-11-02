@@ -56,6 +56,8 @@ module Puppet::CatalogDiff
         end
       end
 
+
+      Puppet.debug("Processing: #{from_file}")
       titles = {}
       titles[:to] = extract_titles(to)
       titles[:from] = extract_titles(from)
