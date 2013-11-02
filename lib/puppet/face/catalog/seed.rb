@@ -51,7 +51,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     when_rendering :console do |output|
       output.each do |header|
-        "#{header}"
+        "Process complete"
       end
     end
   end
