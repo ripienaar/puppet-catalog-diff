@@ -27,8 +27,8 @@ module Puppet::CatalogDiff
     end
 
     def node_summary_header(node,summary)
-      header_spacing = ' ' * (79 - (node.length + summary['total_changes'].length)).to_i
-      "#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary['total_changes']}% \033[0m\n#{"-" * 80}\n"
+      header_spacing = ' ' * (79 - (node.length + summary['total_percentage'].length))
+      "#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary['total_percentage']}% \033[0m\n#{"-" * 80}\n"
     end
 
     def resource_reference(header,resource_id,resource)

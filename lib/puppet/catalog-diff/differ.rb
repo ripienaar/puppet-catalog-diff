@@ -90,7 +90,7 @@ module Puppet::CatalogDiff
       output['percentage_removed'] = '%.2f' % subtractions_percentage
       output['percentage_changed'] = '%.2f' % changes_percentage
       output['resource_changes']   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
-      output['total_changes']      = ((changes_percentage + additions_percentage + subtractions_percentage) / 3).round.to_s
+      output['total_percentage']      = ((changes_percentage + additions_percentage + subtractions_percentage) / 3).round.to_s
       output
     end
   end

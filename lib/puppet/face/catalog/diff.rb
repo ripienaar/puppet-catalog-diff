@@ -106,12 +106,15 @@ Puppet::Face.define(:catalog, '0.0.1') do
         node_name = File.basename(catalog2,File.extname(catalog2))
         nodes[node_name] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
       end
+      nodes['total_percentage'] = (nodes.collect{|node,summary| summary['total_percentage'] }.inject{|sum,x| sum + x }.to_i / nodes.size)
+      nodes['total_nodes']      = nodes.size
       nodes
     end
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
+            next if node == 'total_percentage' or node == 'total_nodes'
             format.node_summary_header(node,summary) + summary.collect do |header,value|
             next if value.nil?
             if value.is_a?(Hash)
@@ -138,7 +141,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
               format.key_pair(header,value)
             end
           end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n")
+      end.join("\n") + "#{'-' * 80}\nProcessed #{nodes['total_nodes']} nodes\n Total Catalog Changes #{nodes['total_percentage']}%\n"
     end
   end
 end
