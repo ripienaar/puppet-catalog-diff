@@ -110,42 +110,34 @@ Puppet::Face.define(:catalog, '0.0.1') do
     end
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
+      format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
-          header_spacing = ' ' * (79 - (node.length + summary['total_changes'].length)).to_i
-          "#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary['total_changes']}% \033[0m\n#{"-" * 80}\n" + summary.collect do |header,value|
+            format.node_summary_header(node,summary) + summary.collect do |header,value|
             next if value.nil?
             if value.is_a?(Hash)
               value.collect do |resource_id,resource|
                 next if resource.nil?
-                # If we find an actual resource print it out
                 if resource.is_a?(Hash) && resource.has_key?(:type)
-                  dsl = Puppet::CatalogDiff::Formater.new().resource_to_string(resource)
-                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n\n#{dsl}"
+                  # If we find an actual resource print it out
+                  format.resource_reference(header,resource_id,resource)
                 elsif resource.is_a?(Array)
-                  # Format string diffs
                   next unless resource.any?
-                  list = "\t#{resource_id}\n" + resource.collect do |k|
-                    "#{k}"
-                  end.join("\n")
-                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n#{list}"
+                  # Format string diffs
+                  format.string_diff(header,resource_id,resource)
                 else
+                  next unless resource.any?
                   # Format hash diffs
-                  params = resource.collect do |k,v|
-                    "#{k} = #{v}"
-                  end.join("\n")
-                  "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n\t#{params}"
+                  format.params_diff(header,resource_id,resource)
                 end
               end
             elsif value.is_a?(Array)
-              next unless value.any?
-              list = value.collect do |k|
-                "\t#{k}"
-              end.join("\n")
-              "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\n#{list}"
+              next if value.empty?
+              # Format arrays
+              format.list(header,value)
             else
-              "\033[1m#{header.gsub("_"," ").capitalize}\033[0m:\t#{value}"
+              format.key_pair(header,value)
             end
-          end.join("\n")
+          end.delete_if {|x| x.nil? or x == []  }.join("\n")
       end.join("\n")
     end
   end
