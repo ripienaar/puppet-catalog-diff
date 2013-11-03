@@ -18,6 +18,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'Do not print classes in resource diffs'
     end
 
+    option "--changed_depth=" do
+      summary "The number of nodes to display sorted by changes"
+    end
+
     description <<-'EOT'
       Prints the differences between catalogs compiled by different puppet master to help
       during migrating to a new Puppet version.
@@ -112,7 +116,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       end
       nodes[:total_percentage] = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
       nodes[:total_nodes]      = nodes.size - 1
-      nodes[:most_changed]      = most_changed.reverse.take(10)
+      nodes[:most_changed]      = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes
     end
     when_rendering :console do |nodes|
