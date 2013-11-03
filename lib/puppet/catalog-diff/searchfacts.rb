@@ -10,14 +10,14 @@ module Puppet::CatalogDiff
     end
 
     def find_nodes(options = {})
-      get_matching_hosts(/.*/)
+      get_matching_hosts()
     end
 
-    def get_matching_hosts(pattern)
+    def get_matching_hosts()
         Puppet::CatalogDiff::Connection.new(@host, @port, @user, @pass, true) do |rest|
             path = "/v2/facts_search/search?facts.#{@args}"
             all_hosts = YAML::load(rest.get(path,{"Accept" => "yaml"}).body)
-            return all_hosts.find_all{|host| Regexp.new(pattern) =~ host}
+            return all_hosts
         end
     end
   end
