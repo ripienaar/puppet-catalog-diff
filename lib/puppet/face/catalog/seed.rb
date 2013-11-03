@@ -35,6 +35,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
       else
         nodes = args.split(',')
       end
+
+      if nodes.empty?
+        Puppet.err("Fact search returned no results")
+      end
+      unless File.directory?(save_directory)
+        Puppet.debug("Directory did not exist, creating #{save_directory}")
+        FileUtils.mkdir(save_directory)
+      end
       THREAD_COUNT = 1
       compiled_nodes = []
       mutex = Mutex.new
@@ -47,12 +55,13 @@ Puppet::Face.define(:catalog, '0.0.1') do
           end
         end
       }.each(&:join)
+      compiled_nodes
     end
 
     when_rendering :console do |output|
-      output.each do |header|
-        "Process complete"
-      end
+      output.collect do |node|
+        "Processed Node: #{node.node_name}"
+      end.join("\n")
     end
   end
 end

@@ -1,7 +1,9 @@
 module Puppet::CatalogDiff
   class CompileCatalog
+    attr_reader :node_name
 
     def initialize(node_name,save_directory)
+      @node_name = node_name
       catalog = render_pson(compile_catalog(node_name))
       save_catalog_to_disk(save_directory,node_name,catalog)
     end
