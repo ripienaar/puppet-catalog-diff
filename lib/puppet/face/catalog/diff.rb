@@ -89,6 +89,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_invoked do |catalog1, catalog2, options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "differ.rb"))
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "findcatalogs.rb"))
+      Puppet.err("Add --debug for realtime output, add --render-as {json,yaml} for parsed output")
+
       nodes = {}
       if File.directory?(catalog1) && File.directory?(catalog2)
         found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
