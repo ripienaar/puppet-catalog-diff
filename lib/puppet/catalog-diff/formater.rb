@@ -37,7 +37,7 @@ module Puppet::CatalogDiff
     end
 
     def string_diff(header,resource_id,resource)
-      list = "\t#{resource_id}\n" + resource.collect do |k|
+      list = "\t#{resource_id.capitalize}\n" + resource.collect do |k|
         "#{k}"
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
@@ -47,7 +47,7 @@ module Puppet::CatalogDiff
       params = resource.collect do |k,v|
         "\t#{k} = #{v}"
       end.join("\n")
-      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id}:\n#{params}"
+      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n#{params}"
     end
     def list(header,value)
       list = value.collect do |k|
