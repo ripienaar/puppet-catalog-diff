@@ -29,6 +29,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_invoked do |save_directory,args,options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "searchfacts.rb"))
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "compilecatalog.rb"))
+
       # If the args contains a fact search then assume its not a node_name
       if args =~ /.*=.*/
         nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
@@ -36,6 +37,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
         nodes = args.split(',')
       end
 
+      unless save_directory =~ /.*\/.*/
+        raise "The directory path passed (#{save_directory}) is not valid, mismatched arguments?"
+      end
       if nodes.empty?
         Puppet.err("Fact search returned no results")
       end
