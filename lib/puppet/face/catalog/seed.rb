@@ -54,8 +54,12 @@ Puppet::Face.define(:catalog, '0.0.1') do
       THREAD_COUNT.times.map {
         Thread.new(nodes,compiled_nodes) do |nodes,compiled_nodes|
           while node_name = mutex.synchronize { nodes.pop }
-            compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
-            mutex.synchronize { compiled_nodes << compiled }
+            begin
+              compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
+              mutex.synchronize { compiled_nodes << compiled }
+            rescue
+              Puppet.err("Unable to compile catalog for #{node_name}")
+            end
           end
         end
       }.each(&:join)
