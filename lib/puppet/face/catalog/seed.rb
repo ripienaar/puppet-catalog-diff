@@ -5,7 +5,7 @@ require 'puppet/application/master'
 Puppet::Face.define(:catalog, '0.0.1') do
   action :seed do
     summary "Generate a series of catalogs"
-    arguments "<path/to/seed/directory>"
+    arguments "<path/to/seed/directory> fact=CaseSensitiveValue"
 
     option "--puppetdb" do
       summary "Not implemented:  retreive node list from puppetdb"
@@ -17,7 +17,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     notes <<-'NOTES'
       This will store files in pson format with the in the save directory. i.e.
       <path/to/seed/directory>/<node_name>.pson . This is currently the only format
-      that is supported.
+      that is supported. You must add --mode master currently on 2.7
 
     NOTES
     examples <<-'EOT'
