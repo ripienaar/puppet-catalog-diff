@@ -49,6 +49,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       end
       THREAD_COUNT = 1
       compiled_nodes = []
+      failed_nodes = []
       mutex = Mutex.new
 
       THREAD_COUNT.times.map {
@@ -59,17 +60,25 @@ Puppet::Face.define(:catalog, '0.0.1') do
               mutex.synchronize { compiled_nodes << compiled }
             rescue
               Puppet.err("Unable to compile catalog for #{node_name}")
+              mutex.synchronize { failed_nodes << node_name }
             end
           end
         end
       }.each(&:join)
-      compiled_nodes
+      output = {}
+      output[:compiled_nodes] = compiled_nodes
+      output[:failed_nodes]   = failed_nodes
+      output
     end
 
     when_rendering :console do |output|
-      output.collect do |node|
-        "Processed Node: #{node.node_name}"
-      end.join("\n")
+      output.collect do |key|
+        if key == :compiled_nodes
+          key.each do |node|
+            "Compiled Node: #{node.node_name}"
+          end
+        end
+      end.join("\n") + "Failed on #{output[:failed_nodes].size} nodes\n#{output[:failed_nodes].join("\n")}"
     end
   end
 end
