@@ -61,8 +61,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
             begin
               compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
               mutex.synchronize { compiled_nodes << compiled }
-            rescue
-              Puppet.err("Unable to compile catalog for #{node_name}")
+            rescue Exception => e
+              Puppet.err("Unable to compile catalog for #{node_name}\n\t#{e}")
               mutex.synchronize { failed_nodes << node_name }
             end
           end
