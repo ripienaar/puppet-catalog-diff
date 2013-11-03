@@ -36,6 +36,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
       else
         nodes = args.split(',')
       end
+      unless nodes.kind_of?(Array)
+        raise "Unable to contact reset API #{nodes}"
+      end
 
       unless save_directory =~ /.*\/.*/
         raise "The directory path passed (#{save_directory}) is not valid, mismatched arguments?"
@@ -78,7 +81,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
             "Compiled Node: #{node.node_name}"
           end
         end
-      end.join("\n") + "Failed on #{output[:failed_nodes].size} nodes\n#{output[:failed_nodes].join("\n")}"
+      end.join("\n") + "#{output[:failed_nodes].join("\n")}\nFailed on #{output[:failed_nodes].size} nodes"
     end
   end
 end
