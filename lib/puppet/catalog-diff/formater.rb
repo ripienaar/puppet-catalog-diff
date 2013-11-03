@@ -55,6 +55,17 @@ module Puppet::CatalogDiff
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
     end
+    def list_hash(header,value)
+      number = 0
+      list = value.collect do |hash|
+        number += 1
+        hash.collect do |key,value|
+          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + value.to_s.length))
+          "#{number}. #{key}#{header_spacing}#{value}"
+        end
+      end.join("\n")
+      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}%"
+    end
     def key_pair(header,value)
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\t#{value}"
     end
