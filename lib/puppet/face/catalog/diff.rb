@@ -97,6 +97,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       if File.directory?(catalog1) && File.directory?(catalog2)
         found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
         new_catalogs = found_catalogs.keys
+
         THREAD_COUNT = 1
         mutex = Mutex.new
 

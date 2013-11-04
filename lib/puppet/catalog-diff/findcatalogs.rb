@@ -35,7 +35,7 @@ module Puppet::CatalogDiff
       new_results.each do |filename,new_path|
         if old_results.has_key?(filename)
           Puppet.debug("Found matching catalog for #{new_path}")
-          matching_catalogs[old_results[filename]] = new_results[filename]
+          matching_catalogs[new_results[filename]] = old_results[filename]
         else
           Puppet.err("Missing partner catalog for #{filename}")
         end
