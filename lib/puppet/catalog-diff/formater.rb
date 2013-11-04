@@ -8,7 +8,8 @@ module Puppet::CatalogDiff
     def resource_to_string(resource)
       str = ''
       str << "\t" + resource[:type].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
-      resource[:parameters].each_pair do |k,v|
+      params = Hash[(resource[:parameters].sort_by {|k, v| k})]
+      params.each_pair do |k,v|
         if v.is_a?(Array)
           indent = " " * k.to_s.size
           str << "\t     #{k} => [" << "\n"
