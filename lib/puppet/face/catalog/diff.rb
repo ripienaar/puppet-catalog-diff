@@ -141,7 +141,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
                   # Format string diffs
                   format.string_diff(header,resource_id,resource)
                 else
-                  next unless resource.any?
+                  next unless resource.nil?
                   # Format hash diffs
                   format.params_diff(header,resource_id,resource)
                 end
@@ -154,7 +154,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
               format.key_pair(header,value)
             end
           end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("Total catalog changes across #{nodes[:total_nodes]} nodes",nodes,:total_percentage)}\n#{format.list_hash("Most changed",nodes[:most_changed])}"
+      end.join("\n") + "#{format.node_summary_header("Total catalog changes across #{nodes[:total_nodes]} nodes",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
     end
   end
 end
