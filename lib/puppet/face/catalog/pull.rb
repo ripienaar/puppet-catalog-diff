@@ -27,7 +27,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
   end
   when_invoked do |node_name,options|
       require 'puppet/network/http_pool'
-      connection = Puppet::Network::HttpPool.http_instance(Puppet[:server], Puppet[:masterport])
+      connection = Puppet::Network::HttpPool.http_instance(Facter.value("fqdn"),'8140')
       connection.request_get("/production/catalog/#{node_name}", {"Accept" => options[:accept]}).body
     end
   end
