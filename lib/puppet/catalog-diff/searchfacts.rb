@@ -14,11 +14,11 @@ module Puppet::CatalogDiff
     end
 
     def get_matching_hosts()
-        Puppet::CatalogDiff::Connection.new(@host, @port, @user, @pass, true) do |rest|
-            path = "/v2/facts_search/search?facts.#{@args}"
-            all_hosts = YAML::load(rest.get(path,{"Accept" => "yaml"}).body)
-            return all_hosts
+        connection = Puppet::Network::HttpPool.http_instance(Facter.value("fqdn"),'8140')
+        unless all_hosts = YAML::load(connection.request_get("/v2/facts_search/search?facts.#{@args}", {"Accept" => 'yaml'}).body)
+          raise "Error parsing yaml output of fact search"
         end
+        all_hosts
     end
   end
 end
