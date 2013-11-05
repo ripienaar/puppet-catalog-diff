@@ -80,17 +80,16 @@ module Puppet::CatalogDiff
 
       additions    = resource_diffs_titles[:titles_only_in_new].size
       subtractions = resource_diffs_titles[:titles_only_in_old].size
-      changes_percentage      = 100*(resource_diffs[:new_params].keys.size.to_f / titles[:from].size.to_f)
-      additions_percentage    = 100*(additions.abs.to_f / titles[:to].size.to_f)
-      subtractions_percentage = 100*(subtractions.abs.to_f / titles[:from].size.to_f)
-
+      changes_percentage      = (titles[:from].size.zero? && 0 || 100*(resource_diffs[:new_params].keys.size.to_f / titles[:from].size.to_f))
+      additions_percentage    = 100*(additions.to_f / titles[:to].size.to_f)
+      subtractions_percentage = (titles[:from].size.zero? && 0 || 100*(subtractions.to_f / titles[:from].size.to_f))
 
 
       output[:percentage_added]   = '%.2f' % additions_percentage
       output[:percentage_removed] = '%.2f' % subtractions_percentage
       output[:percentage_changed] = '%.2f' % changes_percentage
       output[:resource_changes]   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
-      output[:node_percentage]      = ('%.2f' % ((changes_percentage + additions_percentage + subtractions_percentage) % 100)).to_f
+      output[:node_percentage]      = (additions_percentage == 100 && 100 || ('%.2f' % ((changes_percentage + additions_percentage + subtractions_percentage) % 100))).to_f
       output
     end
   end
