@@ -20,9 +20,12 @@ module Puppet::CatalogDiff
       # The following is a hack as I can't pass :mode => master in the 2.7 series
       Puppet[:clientyamldir] = Puppet[:yamldir]
       unless node = Puppet::Face[:node, '0.0.1'].find(node_name,:terminus => 'yaml' )
-        raise "Could not find yaml file for node #{node_name}"
+        raise "Error retrieving node object from yaml terminus #{node_name}"
       end
       Puppet.debug("Found environment #{node.environment} for node #{node_name}")
+      if node.name != node_name
+        raise "The node retrieved from yaml terminus is a mismatch (missing yaml fact file?)"
+      end
       node.environment
     end
 
