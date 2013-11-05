@@ -65,7 +65,7 @@ module Puppet::CatalogDiff
       list = value.collect do |hash|
         number += 1
         hash.collect do |key,value|
-          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + value.to_s.length))
+          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{'%.2f' % value}".to_s.length))
           "#{number}. #{key}#{header_spacing}#{'%.2f' % value}%"
         end
       end.join("\n")
