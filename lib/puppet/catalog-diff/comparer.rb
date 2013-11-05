@@ -21,6 +21,7 @@ module Puppet::CatalogDiff
       differences_in_old = {}
       differences_in_new = {}
       string_differences = {}
+      content_differences = {}
       parameters_in_old = {}
       parameters_in_new = {}
       old.each do |resource|
@@ -66,12 +67,7 @@ module Puppet::CatalogDiff
           end
 
           if options[:content_diff] && resource[:parameters][:content] && new_resource[:parameters][:content] && resource[:parameters][:content][:checksum] != new_resource[:parameters][:content][:checksum]
-            puts
-            puts "Content diff:"
-
-            puts str_diff(resource[:parameters][:content][:content], new_resource[:parameters][:content][:content])
-            puts "-" * 80
-            puts
+            content_differences[resource[:resource_id]] = str_diff(resource[:parameters][:content][:content], new_resource[:parameters][:content][:content])
           end
         end
 
@@ -79,6 +75,7 @@ module Puppet::CatalogDiff
       resource_differences[:old] = differences_in_old
       resource_differences[:new] = differences_in_new
       resource_differences[:string_diffs] = string_differences
+      resource_differences[:content_differences] = content_differences
       resource_differences[:old_params]  = parameters_in_old
       resource_differences[:new_params]  = parameters_in_new
       resource_differences

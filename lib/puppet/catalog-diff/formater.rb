@@ -45,10 +45,14 @@ module Puppet::CatalogDiff
     end
 
     def params_diff(header,resource_id,resource)
-      params = resource.collect do |k,v|
-        "\t#{k} = #{v}"
-      end.join("\n")
-      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n#{params}"
+      unless resource.is_a?(String)
+        params = resource.collect do |k,v|
+          "\t#{k} = #{v}"
+        end.join("\n")
+        "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n#{params}"
+      else
+        "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n#{resource}"
+      end
     end
     def list(header,value)
       list = value.collect do |k|

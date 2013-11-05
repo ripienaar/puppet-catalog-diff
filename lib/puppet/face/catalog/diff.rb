@@ -142,7 +142,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
                   # Format string diffs
                   format.string_diff(header,resource_id,resource)
                 else
-                  next unless resource.nil?
+                  next if resource.nil?
                   # Format hash diffs
                   format.params_diff(header,resource_id,resource)
                 end

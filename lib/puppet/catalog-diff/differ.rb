@@ -77,6 +77,7 @@ module Puppet::CatalogDiff
       output[:differences_as_diff] = resource_diffs[:string_diffs]
       output[:params_in_old]       = resource_diffs[:old_params]
       output[:params_in_new]       = resource_diffs[:new_params]
+      output[:content_differences] = resource_diffs[:content_differences]
 
       additions    = resource_diffs_titles[:titles_only_in_new].size
       subtractions = resource_diffs_titles[:titles_only_in_old].size
