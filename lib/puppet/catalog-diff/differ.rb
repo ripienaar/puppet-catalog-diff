@@ -89,7 +89,9 @@ module Puppet::CatalogDiff
       output[:percentage_removed] = '%.2f' % subtractions_percentage
       output[:percentage_changed] = '%.2f' % changes_percentage
       output[:resource_changes]   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
-      output[:node_percentage]      = (additions_percentage == 100 && 100 || ('%.2f' % ((changes_percentage + additions_percentage + subtractions_percentage) % 100))).to_f
+
+      divide_by = (changes_percentage.zero? ? 0 : 1) + (additions_percentage.zero? ? 0 : 1) + (subtractions_percentage.zero? ? 0 : 1)
+      output[:node_percentage]      = (additions_percentage == 100 && 100 || ('%.2f' % ((changes_percentage + additions_percentage + subtractions_percentage) / divide_by ))).to_f
       output
     end
   end
