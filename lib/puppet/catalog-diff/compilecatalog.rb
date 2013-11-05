@@ -5,8 +5,14 @@ module Puppet::CatalogDiff
 
     def initialize(node_name,save_directory)
       @node_name = node_name
-      catalog = render_pson(compile_catalog(node_name))
-      save_catalog_to_disk(save_directory,node_name,catalog)
+      catalog = compile_catalog(node_name)
+      begin
+        PSON.load(catalog)
+        save_catalog_to_disk(save_directory,node_name,catalog,'pson')
+      rescue
+        Puppet.err("Error compiling catalog #{catalog}")
+        save_catalog_to_disk(save_directory,node_name,catalog,'error')
+      end
     end
 
     def lookup_environment(node_name)
@@ -38,8 +44,8 @@ module Puppet::CatalogDiff
       pson
     end
 
-    def save_catalog_to_disk(save_directory,node_name,catalog)
-      File.open("#{save_directory}/#{node_name}.pson","w") do |f|
+    def save_catalog_to_disk(save_directory,node_name,catalog,extention)
+      File.open("#{save_directory}/#{node_name}.#{extention}","w") do |f|
         f.write(catalog)
       end
     end
