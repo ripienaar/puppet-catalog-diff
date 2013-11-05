@@ -122,8 +122,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
       if nodes.size.zero?
         raise "No nodes were matched"
       end
-      nodes[:total_percentage] = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x }.to_i / nodes.size)
-      nodes[:total_nodes]      = nodes.size - 1
+      nodes[:total_percentage] = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
+      nodes[:total_nodes]      = nodes.size
       nodes[:most_changed]      = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes
     end
