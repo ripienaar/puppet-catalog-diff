@@ -23,7 +23,7 @@ module Puppet::CatalogDiff
         raise "Error retrieving node object from yaml terminus #{node_name}"
       end
       Puppet.debug("Found environment #{node.environment} for node #{node_name}")
-      if node.name != node_name
+      if node.parameters['clientcert'] != node_name
         raise "The node retrieved from yaml terminus is a mismatch (missing yaml fact file?)"
       end
       node.environment
