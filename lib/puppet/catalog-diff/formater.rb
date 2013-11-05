@@ -29,7 +29,7 @@ module Puppet::CatalogDiff
 
     def node_summary_header(node,summary,key)
       header_spacing = ' ' * (79 - (node.length + summary[key].to_s.length))
-      "#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary[key]}% \033[0m\n#{"-" * 80}\n"
+      "\n#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary[key]}% \033[0m\n#{"-" * 80}\n"
     end
 
     def resource_reference(header,resource_id,resource)
