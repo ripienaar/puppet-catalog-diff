@@ -1,3 +1,4 @@
+require 'puppet/network/http_pool'
 module Puppet::CatalogDiff
   class CompileCatalog
     attr_reader :node_name
@@ -21,14 +22,17 @@ module Puppet::CatalogDiff
 
     def compile_catalog(node_name)
       environment = lookup_environment(node_name)
-      unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => environment)
+      connection = Puppet::Network::HttpPool.http_instance(Facter.value("fqdn"),'8140')
+      unless catalog = connection.request_get("/#{environment}/catalog/#{node_name}", {"Accept" => 'pson'}).body
+        #unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => environment)
         raise "Could not compile catalog for #{node_name} in environment #{environment}"
       end
       catalog
     end
 
     def render_pson(catalog)
-      unless pson = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
+      unless pson = PSON::pretty_generate(catalog, :allow_nan => true, :max_nesting => false)
+        #unless pson = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
        raise "Could not render catalog as pson, #{catalog}"
       end
       pson

@@ -1,6 +1,6 @@
 require 'puppet/face'
 require 'thread'
-require 'puppet/application/master'
+#require 'puppet/application/master'
 
 Puppet::Face.define(:catalog, '0.0.1') do
   action :seed do
@@ -50,7 +50,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         Puppet.debug("Directory did not exist, creating #{save_directory}")
         FileUtils.mkdir(save_directory)
       end
-      THREAD_COUNT = 1
+      THREAD_COUNT = 10
       compiled_nodes = []
       failed_nodes = []
       mutex = Mutex.new
