@@ -60,7 +60,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           while node_name = mutex.synchronize { nodes.pop }
             begin
               compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
-              mutex.synchronize { compiled_nodes << compiled }
+              mutex.synchronize { compiled_nodes << node_name }
             rescue Exception => e
               Puppet.err("Unable to compile catalog for #{node_name}\n\t#{e}")
               mutex.synchronize { failed_nodes << node_name }
@@ -78,7 +78,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output.collect do |key|
         if key == :compiled_nodes
           key.each do |node|
-            "Compiled Node: #{node.node_name}"
+            "Compiled Node: #{node}"
           end
         end
       end.join("\n") + "#{output[:failed_nodes].join("\n")}\nFailed on #{output[:failed_nodes].size} nodes"
