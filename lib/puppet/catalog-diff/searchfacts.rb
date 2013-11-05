@@ -1,5 +1,4 @@
 require 'puppet/network/http_pool'
-require File.expand_path(File.join(File.dirname(__FILE__), 'connection.rb'))
 module Puppet::CatalogDiff
   class SearchFacts
 
