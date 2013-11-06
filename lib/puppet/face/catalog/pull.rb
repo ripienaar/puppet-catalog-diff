@@ -68,6 +68,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output = {}
       output[:failed_nodes]   = failed_nodes
       output[:compiled_nodes] = compiled_nodes.compact
+
+
       problem_files = {}
       failed_nodes.each do |node_name,error|
         # Extract the filename and the node a key of the same name
@@ -80,13 +82,22 @@ Puppet::Face.define(:catalog, '0.0.1') do
          Hash[file => nodes.size]
       end
       output[:problem_files]    = most_changed.reverse.take(options[:changed_depth].to_i)
+      example_errors = output[:problem_files].map do |file_hash|
+        example_error = file_hash.map do |file_name,metric|
+           example_node = problem_files[file_name].first
+           error        = failed_nodes[example_node].to_s
+           Hash[error => metric]
+        end.first
+        example_error
+      end
+      output[:example_errors] = example_errors
       output
     end
     when_rendering :console do |output|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       output.collect do |key,value|
-        if value.is_a?(Array)  && key == :problem_files
+        if value.is_a?(Array)  && key == :problem_files or key == :example_errors
           format.list_file_hash(key,value)
         end
       end.join("\n")

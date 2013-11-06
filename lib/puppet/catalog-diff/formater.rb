@@ -1,3 +1,5 @@
+require 'puppet/util/terminal'
+
 module Puppet::CatalogDiff
   class Formater
 
@@ -82,8 +84,8 @@ module Puppet::CatalogDiff
       list = value.collect do |hash|
         number += 1
         hash.collect do |key,value|
-          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{value}".to_s.length))
-          "#{number}. #{key}#{header_spacing}#{value}"
+          header_spacing = ' ' * (79 - ("    Affected nodes".length + value.to_s.length))
+          "#{number}. #{key}\n    Affected nodes:#{header_spacing}#{value}"
         end
       end.join("\n")
       "\n#{"-" * 80}\n\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{"-" * 80}\n#{list}"
