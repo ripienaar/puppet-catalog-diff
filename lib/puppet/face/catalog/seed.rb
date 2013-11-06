@@ -7,8 +7,12 @@ Puppet::Face.define(:catalog, '0.0.1') do
     summary "Generate a series of catalogs"
     arguments "<path/to/seed/directory> fact=CaseSensitiveValue"
 
-    option "--puppetdb" do
-      summary "Not implemented:  retreive node list from puppetdb"
+    option "--master_server SERVER" do
+      summary "The server from which to download the catalogs from"
+      default_to do
+        guess_server = Facter.value('fqdn')
+        guess_server
+      end
     end
 
     description <<-'EOT'
@@ -56,10 +60,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       mutex = Mutex.new
 
       THREAD_COUNT.times.map {
-        Thread.new(nodes,compiled_nodes) do |nodes,compiled_nodes|
+        Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
           while node_name = mutex.synchronize { nodes.pop }
             begin
-              compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory)
+              compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory,options[:master_server])
               mutex.synchronize { compiled_nodes << node_name }
             rescue Exception => e
               Puppet.err("Unable to compile catalog for #{node_name}\n\t#{e}")

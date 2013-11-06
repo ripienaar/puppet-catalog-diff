@@ -3,15 +3,16 @@ module Puppet::CatalogDiff
   class CompileCatalog
     attr_reader :node_name
 
-    def initialize(node_name,save_directory)
+    def initialize(node_name,save_directory,server)
       @node_name = node_name
-      catalog = compile_catalog(node_name)
+      catalog = compile_catalog(node_name,server)
       begin
         PSON.load(catalog)
         save_catalog_to_disk(save_directory,node_name,catalog,'pson')
       rescue
         Puppet.err("Error compiling catalog #{catalog}")
         save_catalog_to_disk(save_directory,node_name,catalog,'error')
+        raise catalog
       end
     end
 
@@ -28,9 +29,10 @@ module Puppet::CatalogDiff
       node.environment
     end
 
-    def compile_catalog(node_name)
+    def compile_catalog(node_name,server)
       environment = lookup_environment(node_name)
-      connection = Puppet::Network::HttpPool.http_instance(Facter.value("fqdn"),'8140')
+      Puppet.debug("Connecting to server: #{server}")
+      connection = Puppet::Network::HttpPool.http_instance(server,'8140')
       unless catalog = connection.request_get("/#{environment}/catalog/#{node_name}", {"Accept" => 'pson'}).body
         #unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => environment)
         raise "Could not compile catalog for #{node_name} in environment #{environment}"
