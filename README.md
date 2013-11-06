@@ -77,6 +77,26 @@ module tool into your module path:
     # puppet module install ripienaar-catalog_diff
     # puppet man catalog diff
 
+Example Usage
+----------
+```shell
+#!/bin/bash
+test -f /tmp/2.7.23_catalogs && rm -rf /tmp/2.7.23_catalogs
+test -f /tmp/3.3.1_catalogs && rm -rf /tmp/3.3.1_catalogs
+export RUBYLIB=/etc/puppet/modules/catalog_diff/lib/
+time puppet catalog pull /tmp/2.7.23_catalogs /tmp/3.3.1_catalogs kernel=Linux \
+--old_server puppet27.example.com \
+--new_server puppet30.example.com \
+--debug \
+--trace \
+--yamldir /var/lib/puppet/yaml \
+--ssldir /var/lib/puppet/ssl
+time puppet catalog diff /tmp/2.7.23_catalogs /tmp/3.3.1_catalogs \
+--debug \
+--show_resource_diff \
+--content_diff \
+--trace
+```
 
 Changelog?
 ----------
