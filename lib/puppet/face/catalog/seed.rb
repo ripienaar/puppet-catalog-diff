@@ -9,10 +9,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     option "--master_server SERVER" do
       summary "The server from which to download the catalogs from"
-      default_to do
-        guess_server = Facter.value('fqdn')
-        guess_server
-      end
+      default_to { Facter.value('fqdn') }
     end
 
     description <<-'EOT'

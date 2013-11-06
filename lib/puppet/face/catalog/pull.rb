@@ -17,6 +17,12 @@ Puppet::Face.define(:catalog, '0.0.1') do
       default_to { 'localhost'}
     end
 
+    option "--changed_depth=" do
+      summary "The number of problem files to display sorted by changes"
+
+      default_to { '10' }
+    end
+
     description <<-'EOT'
       This action is used to seed a series of catalogs from two servers
     EOT
@@ -73,7 +79,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       most_changed = problem_files.sort_by {|file,nodes| nodes.size }.map do |file,nodes|
          Hash[file => nodes.size]
       end
-      output[:problem_files]    = most_changed.reverse.take(10)
+      output[:problem_files]    = most_changed.reverse.take(options['changed_depth'])
       output
     end
     when_rendering :console do |output|
