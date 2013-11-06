@@ -40,25 +40,50 @@ Puppet::Face.define(:catalog, '0.0.1') do
       end
       thread_count = 10
       compiled_nodes = []
-      failed_nodes = []
+      failed_nodes = {}
       mutex = Mutex.new
 
       thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
           while node_name = mutex.synchronize { nodes.pop }
             begin
-              old = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
-              new = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
-              mutex.synchronize { compiled_nodes << node_name }
+              old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
+              mutex.synchronize { compiled_nodes + old_server[:compiled_nodes] }
+
+              new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
+              mutex.synchronize { compiled_nodes + new_server[:compiled_nodes] }
+              mutex.synchronize { failed_nodes[node_name] = new_server[:failed_nodes][node_name] }
             rescue Exception => e
-              mutex.synchronize { failed_nodes << node_name }
+              Puppet.err(e.to_s)
             end
           end
         end
       }.each(&:join)
+      output = {}
+      output[:failed_nodes]   = failed_nodes
+      output[:compiled_nodes] = compiled_nodes.compact
+      problem_files = {}
+      failed_nodes.each do |node_name,error|
+        # Extract the filename and the node a key of the same name
+        match = /(\S*(\/\S*\.pp|\.erb))/.match(error.to_s)
+        if match
+          (problem_files[match[1]] ||= []) << node_name
+        end
+      end
+      most_changed = problem_files.sort_by {|file,nodes| nodes.size }.map do |file,nodes|
+         Hash[file => nodes.size]
+      end
+      output[:problem_files]    = most_changed.reverse.take(10)
+      output
     end
-  when_rendering :console do |output|
-      "test"
+    when_rendering :console do |output|
+      require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
+      format = Puppet::CatalogDiff::Formater.new()
+      output.collect do |key,value|
+        if value.is_a?(Array)  && key == :problem_files
+          format.list_file_hash(key,value)
+        end
+      end.join("\n")
     end
   end
 end

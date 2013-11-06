@@ -32,6 +32,11 @@ module Puppet::CatalogDiff
       "\n#{"-" * 80}\n\033[1m#{node}#{header_spacing}#{summary[key]}% \033[0m\n#{"-" * 80}\n"
     end
 
+    def catalog_summary_header(header,number)
+      header_spacing = ' ' * (79 - ("Total #{header}".length + number.to_s.length))
+      "\n#{"-" * 80}\n\033[1mTotal #{header.to_s.gsub("_"," ").capitalize}#{header_spacing}#{number} \033[0m\n#{"-" * 80}\n"
+    end
+
     def resource_reference(header,resource_id,resource)
       dsl = self.resource_to_string(resource)
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n\t#{resource_id.capitalize}:\n\n#{dsl}"
@@ -67,6 +72,18 @@ module Puppet::CatalogDiff
         hash.collect do |key,value|
           header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{'%.2f' % value}".to_s.length))
           "#{number}. #{key}#{header_spacing}#{'%.2f' % value}%"
+        end
+      end.join("\n")
+      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
+    end
+
+    def list_file_hash(header,value)
+      number = 0
+      list = value.collect do |hash|
+        number += 1
+        hash.collect do |key,value|
+          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{value}".to_s.length))
+          "#{number}. #{key}#{header_spacing}#{value}"
         end
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"

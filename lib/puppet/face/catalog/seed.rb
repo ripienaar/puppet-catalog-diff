@@ -49,7 +49,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       end
       thread_count = 10
       compiled_nodes = []
-      failed_nodes = []
+      failed_nodes = {}
       mutex = Mutex.new
 
       thread_count.times.map {
@@ -60,7 +60,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
               mutex.synchronize { compiled_nodes << node_name }
             rescue Exception => e
               Puppet.err("Unable to compile catalog for #{node_name}\n\t#{e}")
-              mutex.synchronize { failed_nodes << node_name }
+              mutex.synchronize { failed_nodes[node_name] = e }
             end
           end
         end
@@ -68,6 +68,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output = {}
       output[:compiled_nodes] = compiled_nodes
       output[:failed_nodes]   = failed_nodes
+
       output
     end
 
