@@ -79,7 +79,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       most_changed = problem_files.sort_by {|file,nodes| nodes.size }.map do |file,nodes|
          Hash[file => nodes.size]
       end
-      output[:problem_files]    = most_changed.reverse.take(options['changed_depth'])
+      output[:problem_files]    = most_changed.reverse.take(options[:changed_depth].to_i)
       output
     end
     when_rendering :console do |output|
