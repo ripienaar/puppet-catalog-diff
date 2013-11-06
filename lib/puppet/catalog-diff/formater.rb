@@ -86,7 +86,7 @@ module Puppet::CatalogDiff
           "#{number}. #{key}#{header_spacing}#{value}"
         end
       end.join("\n")
-      "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
+      "\n#{"-" * 80}\n\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{"-" * 80}\n#{list}"
     end
     def key_pair(header,value)
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\t#{value}"
