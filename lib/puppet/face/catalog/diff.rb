@@ -122,43 +122,46 @@ Puppet::Face.define(:catalog, '0.0.1') do
       if nodes.size.zero?
         raise "No nodes were matched"
       end
-      nodes[:total_percentage] = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
-      nodes[:total_nodes]      = nodes.size
-      nodes[:most_changed]      = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
+
+      total_nodes        = nodes.size
+      nodes[:total_percentage]   = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
+      nodes[:with_changes]       = nodes.select { |node,summary| summary.is_a?(Hash) && !summary[:node_percentage].zero? }.size
+      nodes[:most_changed]       = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
+      nodes[:total_nodes]        = total_nodes
       nodes
     end
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
-            next if node == :total_percentage or node == :total_nodes or node == :most_changed
-            format.node_summary_header(node,summary,:node_percentage) + summary.collect do |header,value|
-            next if value.nil?
-            if value.is_a?(Hash)
-              value.collect do |resource_id,resource|
-                next if resource.nil?
-                if resource.is_a?(Hash) && resource.has_key?(:type)
-                  # If we find an actual resource print it out
-                  format.resource_reference(header,resource_id,resource)
-                elsif resource.is_a?(Array)
-                  next unless resource.any?
-                  # Format string diffs
-                  format.string_diff(header,resource_id,resource)
-                else
-                  next if resource.nil?
-                  # Format hash diffs
-                  format.params_diff(header,resource_id,resource)
-                end
-              end
-            elsif value.is_a?(Array)
-              next if value.empty?
-              # Format arrays
-              format.list(header,value)
+      next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes
+      format.node_summary_header(node,summary,:node_percentage) + summary.collect do |header,value|
+        next if value.nil?
+        if value.is_a?(Hash)
+          value.collect do |resource_id,resource|
+            next if resource.nil?
+            if resource.is_a?(Hash) && resource.has_key?(:type)
+              # If we find an actual resource print it out
+              format.resource_reference(header,resource_id,resource)
+            elsif resource.is_a?(Array)
+              next unless resource.any?
+              # Format string diffs
+              format.string_diff(header,resource_id,resource)
             else
-              format.key_pair(header,value)
+              next if resource.nil?
+              # Format hash diffs
+              format.params_diff(header,resource_id,resource)
             end
-          end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("Total catalog changes across #{nodes[:total_nodes]} nodes",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
+          end
+        elsif value.is_a?(Array)
+          next if value.empty?
+          # Format arrays
+          format.list(header,value)
+        else
+          format.key_pair(header,value)
+        end
+        end.delete_if {|x| x.nil? or x == []  }.join("\n")
+      end.join("\n") + "#{format.node_summary_header("Processed #{nodes[:total_nodes]} nodes of which #{nodes[:with_changes]} changed. Total infrastructure changes:",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
     end
   end
 end
