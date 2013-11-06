@@ -83,7 +83,7 @@ module Puppet::CatalogDiff
       list = value.collect do |hash|
         number += 1
         hash.collect do |key,value|
-          "\033[1m#{number}.\033[0m #{key}\n"
+          "\033[1m#{number}. #{value}\033[0m\n\t#{key}\n"
         end
       end.join("\n")
       "\n#{"-" * 80}\n\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{"-" * 80}\n#{list}"

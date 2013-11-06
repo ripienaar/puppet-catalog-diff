@@ -86,7 +86,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         example_error = file_hash.map do |file_name,metric|
            example_node = problem_files[file_name].first
            error        = failed_nodes[example_node].to_s
-           Hash[error => metric]
+           Hash[error => example_node]
         end.first
         example_error
       end
