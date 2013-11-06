@@ -10,7 +10,7 @@ module Puppet::CatalogDiff
         PSON.load(catalog)
         save_catalog_to_disk(save_directory,node_name,catalog,'pson')
       rescue
-        Puppet.err("Error compiling catalog #{catalog}")
+        Puppet.err("Server returned invalid catalog for #{node_name}")
         save_catalog_to_disk(save_directory,node_name,catalog,'error')
         raise catalog
       end
