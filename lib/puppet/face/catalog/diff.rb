@@ -161,7 +161,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           format.key_pair(header,value)
         end
         end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("Processed #{nodes[:total_nodes]} nodes of which #{nodes[:with_changes]} changed. Total infrastructure changes:",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
+      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
     end
   end
 end
