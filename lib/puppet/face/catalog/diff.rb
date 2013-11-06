@@ -115,17 +115,18 @@ Puppet::Face.define(:catalog, '0.0.1') do
         node_name = File.basename(catalog2,File.extname(catalog2))
         nodes[node_name] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
       end
-
-      most_changed = nodes.sort_by {|node,summary| summary[:node_percentage]}.map do |node,summary|
-         Hash[node => summary[:node_percentage]]
-      end
       if nodes.size.zero?
         raise "No nodes were matched"
       end
 
+      with_changes = nodes.select { |node,summary| summary.is_a?(Hash) && !summary[:node_percentage].zero? }
+      most_changed = with_changes.sort_by {|node,summary| summary[:node_percentage]}.map do |node,summary|
+         Hash[node => summary[:node_percentage]]
+      end
+
       total_nodes        = nodes.size
       nodes[:total_percentage]   = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
-      nodes[:with_changes]       = nodes.select { |node,summary| summary.is_a?(Hash) && !summary[:node_percentage].zero? }.size
+      nodes[:with_changes]       = with_changes.size
       nodes[:most_changed]       = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes[:total_nodes]        = total_nodes
       nodes
@@ -161,7 +162,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           format.key_pair(header,value)
         end
         end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes",nodes[:most_changed])}"
+      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed:",nodes[:most_changed])}"
     end
   end
 end
