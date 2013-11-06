@@ -40,26 +40,19 @@ Puppet::Face.define(:catalog, '0.0.1') do
       else
         nodes = args.split(',')
       end
-      unless nodes.kind_of?(Array)
-        raise "Unable to contact reset API #{nodes}"
-      end
-
       unless save_directory =~ /.*\/.*/
         raise "The directory path passed (#{save_directory}) is not an absolute path, mismatched arguments?"
-      end
-      if nodes.empty?
-        Puppet.err("Fact search returned no results")
       end
       unless File.directory?(save_directory)
         Puppet.debug("Directory did not exist, creating #{save_directory}")
         FileUtils.mkdir(save_directory)
       end
-      THREAD_COUNT = 10
+      thread_count = 10
       compiled_nodes = []
       failed_nodes = []
       mutex = Mutex.new
 
-      THREAD_COUNT.times.map {
+      thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
           while node_name = mutex.synchronize { nodes.pop }
             begin
