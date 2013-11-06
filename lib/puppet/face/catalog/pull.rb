@@ -97,8 +97,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       output.collect do |key,value|
-        if value.is_a?(Array)  && key == :problem_files or key == :example_errors
+        if value.is_a?(Array)  && key == :problem_files
           format.list_file_hash(key,value)
+        elsif value.is_a?(Array) && key == :example_errors
+          format.list_error_hash(key,value)
         end
       end.join("\n")
     end

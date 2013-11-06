@@ -78,7 +78,16 @@ module Puppet::CatalogDiff
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
     end
-
+    def list_error_hash(header,value)
+      number = 0
+      list = value.collect do |hash|
+        number += 1
+        hash.collect do |key,value|
+          "#{number}. #{key}\n"
+        end
+      end.join("\n")
+      "\n#{"-" * 80}\n\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{"-" * 80}\n#{list}"
+    end
     def list_file_hash(header,value)
       number = 0
       list = value.collect do |hash|
