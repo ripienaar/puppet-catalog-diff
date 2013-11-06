@@ -63,8 +63,8 @@ module Puppet::CatalogDiff
       titles[:from] = extract_titles(from)
 
       output = {}
-      output[:total_in_old] = titles[:from].size
-      output[:total_in_new] = titles[:to].size
+      output[:total_resources_in_old] = titles[:from].size
+      output[:total_resources_in_new] = titles[:to].size
 
 
       resource_diffs_titles = return_resource_diffs(titles[:to], titles[:from])
@@ -86,10 +86,10 @@ module Puppet::CatalogDiff
       subtractions_percentage = (titles[:from].size.zero? && 0 || 100*(subtractions.to_f / titles[:from].size.to_f))
 
 
-      output[:percentage_added]   = '%.2f' % additions_percentage
-      output[:percentage_removed] = '%.2f' % subtractions_percentage
-      output[:percentage_changed] = '%.2f' % changes_percentage
-      output[:resource_changes]   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
+      output[:catalag_percentage_added]   = '%.2f' % additions_percentage
+      output[:catalog_percentage_removed] = '%.2f' % subtractions_percentage
+      output[:catalog_percentage_changed] = '%.2f' % changes_percentage
+      output[:added_and_removed_resources]   = "#{(!additions.zero?  && "+#{additions}" || 0)} / #{(!subtractions.zero?  && "-#{subtractions}" || 0)}"
 
       divide_by = (changes_percentage.zero? ? 0 : 1) + (additions_percentage.zero? ? 0 : 1) + (subtractions_percentage.zero? ? 0 : 1)
       output[:node_percentage]      = (divide_by == 0 && 0 || additions_percentage == 100 && 100 || (changes_percentage + additions_percentage + subtractions_percentage) / divide_by ).to_f
