@@ -24,7 +24,7 @@ module Puppet::CatalogDiff
       end
       Puppet.debug("Found environment #{node.environment} for node #{node_name}")
       if node.parameters['clientcert'] != node_name
-        raise "The node retrieved from yaml terminus is a mismatch (missing yaml fact file?)"
+        raise "The node retrieved from yaml terminus is a mismatch node returned was (#{node.parameters['clientcert']})"
       end
       node.environment
     end
