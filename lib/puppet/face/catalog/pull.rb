@@ -11,10 +11,15 @@ Puppet::Face.define(:catalog, '0.0.1') do
       required
       summary "This the valid certificate name or alt name for your old server"
     end
+
     option "--new_server=" do
       summary "This the valid certificate name or alt name for your old server"
 
-      default_to { 'localhost'}
+      default_to { Facter.value("fqdn") }
+    end
+
+    option "--use_puppetdb" do
+      summary "Use puppetdb to do the fact search instead of the rest api"
     end
 
     option "--changed_depth=" do
