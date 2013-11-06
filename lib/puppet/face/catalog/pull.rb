@@ -86,7 +86,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       output[:failed_to_compile_files]    = most_changed.reverse.take(options[:changed_depth].to_i)
 
-      example_errors = problem_files.map do |file_hash|
+      example_errors = output[:failed_to_compile_files].map do |file_hash|
         example_error = file_hash.map do |file_name,metric|
            example_node = problem_files[file_name].first
            error        = failed_nodes[example_node].to_s
@@ -101,7 +101,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       output.collect do |key,value|
-        if value.is_a?(Array)  && key == :problem_files
+        if value.is_a?(Array)  && key == :failed_to_compile_files
           format.list_file_hash(key,value)
         elsif value.is_a?(Array) && key == :example_compile_errors
           format.list_error_hash(key,value)
