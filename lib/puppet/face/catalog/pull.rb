@@ -38,18 +38,26 @@ Puppet::Face.define(:catalog, '0.0.1') do
       unless nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
         raise "Problem finding nodes with query #{args}"
       end
+      thread_count = 10
+      compiled_nodes = []
+      failed_nodes = []
+      mutex = Mutex.new
 
-      nodes.each do |node|
-        unless result = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node,:master_server => options[:old_server] )
-          Puppet.err("Unable to process old catalog for #{node}")
+      thread_count.times.map {
+        Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
+          while node_name = mutex.synchronize { nodes.pop }
+            begin
+              old = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
+              new = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
+              mutex.synchronize { compiled_nodes << node_name }
+            rescue Exception => e
+              mutex.synchronize { failed_nodes << node_name }
+            end
+          end
         end
-        unless result = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node,:master_server => options[:new_server] )
-          Puppet.err("Unable to process new catalog for #{node}")
-        end
-      end
+      }.each(&:join)
     end
-
-    when_rendering :console do |output|
+  when_rendering :console do |output|
       "test"
     end
   end
