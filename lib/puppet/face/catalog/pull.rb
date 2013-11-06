@@ -71,6 +71,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
 
       problem_files = {}
+
       failed_nodes.each do |node_name,error|
         # Extract the filename and the node a key of the same name
         match = /(\S*(\/\S*\.pp|\.erb))/.match(error.to_s)
@@ -78,11 +79,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
           (problem_files[match[1]] ||= []) << node_name
         end
       end
+
       most_changed = problem_files.sort_by {|file,nodes| nodes.size }.map do |file,nodes|
          Hash[file => nodes.size]
       end
-      output[:problem_files]    = most_changed.reverse.take(options[:changed_depth].to_i)
-      example_errors = output[:problem_files].map do |file_hash|
+
+      output[:failed_to_compile_files]    = most_changed.reverse.take(options[:changed_depth].to_i)
+
+      example_errors = problem_files.map do |file_hash|
         example_error = file_hash.map do |file_name,metric|
            example_node = problem_files[file_name].first
            error        = failed_nodes[example_node].to_s
@@ -90,7 +94,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         end.first
         example_error
       end
-      output[:example_errors] = example_errors
+      output[:example_compile_errors] = example_errors
       output
     end
     when_rendering :console do |output|
@@ -99,7 +103,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output.collect do |key,value|
         if value.is_a?(Array)  && key == :problem_files
           format.list_file_hash(key,value)
-        elsif value.is_a?(Array) && key == :example_errors
+        elsif value.is_a?(Array) && key == :example_compile_errors
           format.list_error_hash(key,value)
         end
       end.join("\n")
