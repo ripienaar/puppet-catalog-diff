@@ -124,10 +124,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
          Hash[node => summary[:node_percentage]]
       end
 
+      most_differences = with_changes.sort_by {|node,summary| summary[:node_differences]}.map do |node,summary|
+         Hash[node => summary[:node_differences]]
+      end
       total_nodes        = nodes.size
       nodes[:total_percentage]   = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
       nodes[:with_changes]       = with_changes.size
       nodes[:most_changed]       = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
+      nodes[:most_differences]   = most_differences.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes[:total_nodes]        = total_nodes
       nodes
     end
@@ -135,7 +139,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
-      next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes
+      next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes or node == :most_differences
       format.node_summary_header(node,summary,:node_percentage) + summary.collect do |header,value|
         next if value.nil?
         if value.is_a?(Hash)
@@ -162,7 +166,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           format.key_pair(header,value)
         end
         end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed:",nodes[:most_changed])}"
+      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed",nodes[:most_changed])}\n\n#{format.list_hash("Nodes with the most changes by differeces",nodes[:most_differences],'')}"
     end
   end
 end

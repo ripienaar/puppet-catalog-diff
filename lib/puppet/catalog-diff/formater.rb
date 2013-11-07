@@ -67,13 +67,13 @@ module Puppet::CatalogDiff
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
     end
-    def list_hash(header,value)
+    def list_hash(header,value,mark = '%')
       number = 0
       list = value.collect do |hash|
         number += 1
         hash.collect do |key,value|
-          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{'%.2f' % value}".to_s.length))
-          "#{number}. #{key}#{header_spacing}#{'%.2f' % value}%"
+          header_spacing = ' ' * (79 - ("#{number}. #{key}".length + "#{(mark == '%' && "%.2f" % value || value)}".to_s.length))
+          "#{number}. #{key}#{header_spacing}#{(mark == '%' && "%.2f" % value || value)}#{mark}"
         end
       end.join("\n")
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\n#{list}"
