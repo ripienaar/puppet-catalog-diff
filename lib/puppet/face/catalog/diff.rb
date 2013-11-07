@@ -46,34 +46,6 @@ Puppet::Face.define(:catalog, '0.0.1') do
        - i.e. path/to/old/node_name.yaml and path/to/new/node_name.yaml
                    puppet catalog diff <path/to/old> <path/to/new>
 
-      Example Output:
-
-      During the transition of 0.24.x to 0.25.x there was a serialization bug
-      that resulted in unexpected file content changes, I've recreated this bug
-      in a tiny 2 resource catalog, the output below shows how this tool would
-      have highlighted this bug prior to upgrading any nodes.
-
-        Resource counts:
-          Old: 2
-          New: 2
-
-        Catalogs contain the same resources by resource title
-
-
-        Individual Resource differences:
-        Old Resource:
-          file{"/tmp/foo":
-             content => d3b07384d113edec49eaa6238ad5ff00
-          }
-
-        New Resource:
-          file{"/tmp/foo":
-             content => dbb53f3699703c028483658773628452
-          }
-
-      Had resources simply gone missing - not the case here - you would have seen
-      a list of that.
-
       This code only validates the catalogs, it cannot tell you if the behavior of
       the providers that interpret the catalog has changed so testing is still
       recommended, this is just one tool to take away some of the uncertainty
