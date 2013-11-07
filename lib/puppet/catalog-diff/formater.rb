@@ -102,5 +102,15 @@ module Puppet::CatalogDiff
     def key_pair(header,value)
       "\033[1m#{header.to_s.gsub("_"," ").capitalize}\033[0m:\t#{value}"
     end
+
+    def render_pull(output)
+      output.collect do |key,value|
+        if value.is_a?(Array)  && key == :failed_to_compile_files
+          self.list_file_hash(key,value)
+        elsif value.is_a?(Array) && key == :example_compile_errors
+          self.list_error_hash(key,value)
+        end
+      end.join("\n")
+    end
   end
 end

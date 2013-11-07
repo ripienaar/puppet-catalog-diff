@@ -27,6 +27,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     option "--changed_depth=" do
       summary "The number of nodes to display sorted by changes"
+      default_to { "10" }
     end
 
     description <<-'EOT'
@@ -107,9 +108,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
         # User passed use two hostnames
         old_catalogs = Dir.mktmpdir("#{catalog1}-")
         new_catalogs = Dir.mktmpdir("#{catalog2}-")
-        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:changed_depth => options[:changed_depth])
+        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth])
         diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,:changed_depth => options[:changed_depth])
         nodes = diff_output
+        nodes[:pull_output] = pull_output
         return nodes
       end
       raise "No nodes were matched" if nodes.size.zero?
@@ -135,7 +137,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
-      next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes or node == :most_differences
+      next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes or node == :most_differences or node == :pull_output
       format.node_summary_header(node,summary,:node_percentage) + summary.collect do |header,value|
         next if value.nil?
         if value.is_a?(Hash)
@@ -162,7 +164,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           format.key_pair(header,value)
         end
         end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed",nodes[:most_changed])}\n\n#{format.list_hash("Nodes with the most changes by differeces",nodes[:most_differences],'')}"
+      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed",nodes[:most_changed])}\n\n#{format.list_hash("Nodes with the most changes by differeces",nodes[:most_differences],'')}#{(nodes.has_key?(:pull_output) && format.render_pull(nodes[:pull_output]))}"
     end
   end
 end

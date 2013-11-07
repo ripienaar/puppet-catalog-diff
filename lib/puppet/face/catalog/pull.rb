@@ -64,7 +64,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
               new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
               mutex.synchronize { compiled_nodes + new_server[:compiled_nodes] }
-              mutex.synchronize { failed_nodes[node_name] = new_server[:failed_nodes][node_name] }
+              mutex.synchronize { new_server[:failed_nodes][node_name].nil? || failed_nodes[node_name] = new_server[:failed_nodes][node_name] }
             rescue Exception => e
               Puppet.err(e.to_s)
             end
@@ -74,7 +74,6 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output = {}
       output[:failed_nodes]   = failed_nodes
       output[:compiled_nodes] = compiled_nodes.compact
-
 
       problem_files = {}
 
