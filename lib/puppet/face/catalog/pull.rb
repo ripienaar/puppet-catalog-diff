@@ -82,6 +82,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
         match = /(\S*(\/\S*\.pp|\.erb))/.match(error.to_s)
         if match
           (problem_files[match[1]] ||= []) << node_name
+        else
+          (problem_files['unspecified_file_errors'] ||= []) << node_name
         end
       end
 
