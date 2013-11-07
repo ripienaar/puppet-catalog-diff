@@ -1,10 +1,17 @@
 require 'puppet/face'
 require  'thread'
+require 'pp'
 Puppet::Face.define(:catalog, '0.0.1') do
 
   action :diff do
     summary "Compare catalogs from different puppet versions."
     arguments "<catalog1> <catalog2>"
+
+    option "--fact_search" do
+      summary "Fact search used to filter which catalogs are compiled and compared"
+
+      default_to { 'kernel=Linux' }
+    end
 
     option "--content_diff" do
       summary "Whether to show a diff for File resource content"
@@ -63,17 +70,25 @@ Puppet::Face.define(:catalog, '0.0.1') do
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "findcatalogs.rb"))
       Puppet.err("Add --debug for realtime output, add --render-as {json,yaml} for parsed output")
 
-      raise "You must pass unique paths to the arguments (#{catalog1} = #{catalog2})" if catalog1 == catalog2
+      #raise "You must pass unique paths to the arguments (#{catalog1} = #{catalog2})" if catalog1 == catalog2
+
+
+      # Sanity check for mismatched arguments
+      if File.directory?(catalog1) && File.file?(catalog2) || File.file?(catalog1) && File.directory?(catalog2)
+        raise "You must pass a file,diretory or hostname to both parameters"
+      end
 
       nodes = {}
+
       if File.directory?(catalog1) && File.directory?(catalog2)
+        # User passed us two directories full of pson
         found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
         new_catalogs = found_catalogs.keys
 
-        THREAD_COUNT = 1
+        thread_count = 1
         mutex = Mutex.new
 
-        THREAD_COUNT.times.map {
+        thread_count.times.map {
           Thread.new(nodes,new_catalogs,options) do |nodes,new_catalogs,options|
             while new_catalog = mutex.synchronize { new_catalogs.pop }
               node_name    = File.basename(new_catalog,File.extname(new_catalog))
@@ -83,13 +98,21 @@ Puppet::Face.define(:catalog, '0.0.1') do
             end
           end
         }.each(&:join)
-      else
+      elsif File.file?(catalog1) && File.file?(catalog2)
+        # User passed us two files
         node_name = File.basename(catalog2,File.extname(catalog2))
         nodes[node_name] = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+
+      else
+        # User passed use two hostnames
+        old_catalogs = Dir.mktmpdir("#{catalog1}-")
+        new_catalogs = Dir.mktmpdir("#{catalog2}-")
+        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:changed_depth => options[:changed_depth])
+        diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,:changed_depth => options[:changed_depth])
+        nodes = diff_output
+        return nodes
       end
-      if nodes.size.zero?
-        raise "No nodes were matched"
-      end
+      raise "No nodes were matched" if nodes.size.zero?
 
       with_changes = nodes.select { |node,summary| summary.is_a?(Hash) && !summary[:node_percentage].zero? }
       most_changed = with_changes.sort_by {|node,summary| summary[:node_percentage]}.map do |node,summary|
@@ -100,13 +123,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
          Hash[node => summary[:node_differences]]
       end
       total_nodes        = nodes.size
-      nodes[:total_percentage]   = (nodes.collect{|node,summary| summary[:node_percentage] }.inject{|sum,x| sum.to_f + x } / nodes.size)
+      nodes[:total_percentage]   = (nodes.collect{|node,summary| summary.is_a?(Hash) && summary[:node_percentage] || nil }.compact.inject{|sum,x| sum.to_f + x } / total_nodes)
       nodes[:with_changes]       = with_changes.size
       nodes[:most_changed]       = most_changed.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes[:most_differences]   = most_differences.reverse.take((options.has_key?(:changed_depth) && options[:changed_depth].to_i || 10))
       nodes[:total_nodes]        = total_nodes
       nodes
     end
+
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
       format = Puppet::CatalogDiff::Formater.new()
