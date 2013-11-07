@@ -1,5 +1,6 @@
 require 'puppet/face'
 require 'thread'
+require 'digest'
 #require 'puppet/application/master'
 
 Puppet::Face.define(:catalog, '0.0.1') do
@@ -83,7 +84,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
         if match
           (problem_files[match[1]] ||= []) << node_name
         else
-          (problem_files['unspecified_file_errors'] ||= []) << node_name
+          unique_token = Digest::MD5.hexdigest(error.to_s.gsub(node_name,''))
+          (problem_files["No-path-in-error-#{unique_token}"] ||= []) << node_name
         end
       end
 
