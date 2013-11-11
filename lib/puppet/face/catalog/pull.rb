@@ -56,7 +56,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         raise "Problem finding nodes with query #{args}"
       end
       total_nodes = nodes.size
-      thread_count = 10
+      thread_count = options[:threads]
       compiled_nodes = []
       failed_nodes = {}
       mutex = Mutex.new
