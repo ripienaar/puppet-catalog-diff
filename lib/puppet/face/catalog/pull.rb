@@ -50,6 +50,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
       unless nodes = Puppet::CatalogDiff::SearchFacts.new(args).find_nodes(options)
         raise "Problem finding nodes with query #{args}"
       end
+      total_nodes = nodes.size
       thread_count = 10
       compiled_nodes = []
       failed_nodes = {}
@@ -76,9 +77,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
       output[:failed_nodes_total]   = failed_nodes.size
       output[:compiled_nodes]       = compiled_nodes.compact
       output[:compiled_nodes_total] = compiled_nodes.compact.size
-      output[:total_nodes]          = nodes.size
-      output[:total_percentage]     = 100 *(output[:failed_nodes_total] /  output[:total_nodes])
-
+      output[:total_nodes]          = total_nodes
+      output[:total_percentage]     = (failed_nodes.size.to_f / total_nodes.to_f) * 100
       problem_files = {}
 
       failed_nodes.each do |node_name,error|

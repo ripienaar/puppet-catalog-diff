@@ -1,5 +1,4 @@
 require 'puppet/util/terminal'
-
 module Puppet::CatalogDiff
   class Formater
 
