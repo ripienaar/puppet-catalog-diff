@@ -72,9 +72,13 @@ Puppet::Face.define(:catalog, '0.0.1') do
         end
       }.each(&:join)
       output = {}
-      output[:failed_nodes]   = failed_nodes
-      output[:compiled_nodes] = compiled_nodes.compact
-
+      output[:failed_nodes]         = failed_nodes
+      output[:failed_nodes_total]   = failed_nodes.size
+      output[:compiled_nodes]       = compiled_nodes.compact
+      output[:compiled_nodes_total] = compiled_nodes.compact.size
+      output[:total_nodes]          = compiled_nodes.compact.size + failed_nodes.size
+      output[:total_percentage]     = 100 *(output[:failed_nodes_total] /  output[:total_nodes])
+ 
       problem_files = {}
 
       failed_nodes.each do |node_name,error|

@@ -104,13 +104,13 @@ module Puppet::CatalogDiff
     end
 
     def render_pull(output)
-      output.collect do |key,value|
+       output.collect do |key,value|
         if value.is_a?(Array)  && key == :failed_to_compile_files
           self.list_file_hash(key,value)
         elsif value.is_a?(Array) && key == :example_compile_errors
           self.list_error_hash(key,value)
         end
-      end.join("\n")
+      end.join("\n") + "#{self.node_summary_header("#{output[:failed_nodes_total]} out of #{output[:total_nodes]} nodes compiled",output,:total_percentage)}" 
     end
   end
 end
