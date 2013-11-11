@@ -1,4 +1,4 @@
-What?
+# Overview
 =====
 A tool to compare two Puppet catalogs.
 
@@ -13,6 +13,15 @@ This tool is delivered as a Puppet Face. It thus requires a Puppet installation
 to properly run.
 
 The diff tool recognizes catalogs in yaml, marshall, or pson format.
+
+The tool can automatically compile the catalogs for both your new and older servers.
+It can ask the master to use the yaml cache to compile the catalog for the last
+known environment with the last known facts. It can then validate against th facts
+terminus ( or by proxy puppetdb ) that the node is still active. This filtered list
+will then be processed for differences in that catalog
+
+# Usage
+
 
 Validation Process:
 
