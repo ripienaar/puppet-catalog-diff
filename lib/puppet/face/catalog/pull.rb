@@ -56,18 +56,16 @@ Puppet::Face.define(:catalog, '0.0.1') do
         raise "Problem finding nodes with query #{args}"
       end
       total_nodes = nodes.size
-      thread_count = options[:threads]
+      thread_count = options[:threads].to_i
       compiled_nodes = []
       failed_nodes = {}
       mutex = Mutex.new
 
       thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
-         n = 0
          while node_name = mutex.synchronize { nodes.pop }
             begin
-              n += 1
-              if n.odd?
+              if nodes.size.odd?
                 old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
                 new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
               else
