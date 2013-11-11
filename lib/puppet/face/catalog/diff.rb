@@ -1,6 +1,6 @@
 require 'puppet/face'
 require  'thread'
-require 'pp'
+require 'json'
 Puppet::Face.define(:catalog, '0.0.1') do
 
   action :diff do
@@ -11,6 +11,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary "Fact search used to filter which catalogs are compiled and compared"
 
       default_to { 'kernel=Linux' }
+    end
+
+    option "--output_report=" do
+      summary "Save the final report as json"
     end
 
     option "--content_diff" do
@@ -109,9 +113,16 @@ Puppet::Face.define(:catalog, '0.0.1') do
         old_catalogs = Dir.mktmpdir("#{catalog1}-")
         new_catalogs = Dir.mktmpdir("#{catalog2}-")
         pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth])
-        diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,:changed_depth => options[:changed_depth])
+        diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,options)
         nodes = diff_output
         nodes[:pull_output] = pull_output
+        # Save the file as it can take a while to create
+        if options[:output_report]
+          Puppet.notice("Writing report to disk: #{options[:output_report]}")
+          File.open(options[:output_report],"w") do |f|
+            f.write(nodes.to_json)
+          end
+        end
         return nodes
       end
       raise "No nodes were matched" if nodes.size.zero?
@@ -135,6 +146,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     when_rendering :console do |nodes|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "formater.rb"))
+
       format = Puppet::CatalogDiff::Formater.new()
       nodes.collect do |node,summary|
       next if node == :total_percentage or node == :total_nodes or node == :most_changed or node == :with_changes or node == :most_differences or node == :pull_output
