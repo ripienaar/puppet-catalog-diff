@@ -13,7 +13,7 @@ module Puppet::CatalogDiff
      # Then validate they are active nodes against the rest of puppetdb api
      yaml_cache = find_nodes_local(*@args.split("="))
      if options[:use_puppetdb]
-       active_nodes = find_nodes_puppetdb(options[:new_server])
+       active_nodes = find_nodes_puppetdb()
      else
        active_nodes = find_nodes_rest(options[:old_server])
      end
@@ -48,10 +48,11 @@ module Puppet::CatalogDiff
         filtered
     end
 
-    def find_nodes_puppetdb(server)
-        connection = Puppet::Network::HttpPool.http_instance(server,'8081')
+    def find_nodes_puppetdb()
+        connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,'8081')
         fact_query = @args.split("=")
-        json_query = URI.escape(["=", ["fact", fact_query[0]], fact_query[1]].to_json)
+        #json_query = URI.escape(["=", ["fact", fact_query[0]], fact_query[1]].to_json)
+        json_query = URI.escape(["=", ["node","active"], true].to_json)
         unless filtered = PSON.load(connection.request_get("/v2/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
