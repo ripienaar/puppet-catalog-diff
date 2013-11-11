@@ -110,7 +110,7 @@ module Puppet::CatalogDiff
         elsif value.is_a?(Array) && key == :example_compile_errors
           self.list_error_hash(key,value)
         end
-      end.join("\n") + "#{self.node_summary_header("#{output[:failed_nodes_total]} out of #{output[:total_nodes]} nodes compiled",output,:total_percentage)}" 
+      end.join("\n") + "#{self.node_summary_header("#{output[:failed_nodes_total]} out of #{output[:total_nodes]} nodes failed to compile. failure rate:",output,:total_percentage)}"
     end
   end
 end
