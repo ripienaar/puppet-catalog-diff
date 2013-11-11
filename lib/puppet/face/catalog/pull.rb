@@ -19,6 +19,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
       default_to { Facter.value("fqdn") }
     end
 
+    option "--threads" do
+      summary "The number of threads to use"
+      default_to { '10' }
+    end
+
     option "--use_puppetdb" do
       summary "Use puppetdb to do the fact search instead of the rest api"
     end
@@ -58,12 +63,18 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
-          while node_name = mutex.synchronize { nodes.pop }
+         n = 0
+         while node_name = mutex.synchronize { nodes.pop }
             begin
-              old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
+              n += 1
+              if n.odd?
+                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
+                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
+              else
+                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
+                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server] )
+              end
               mutex.synchronize { compiled_nodes + old_server[:compiled_nodes] }
-
-              new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server] )
               mutex.synchronize { compiled_nodes + new_server[:compiled_nodes] }
               mutex.synchronize { new_server[:failed_nodes][node_name].nil? || failed_nodes[node_name] = new_server[:failed_nodes][node_name] }
             rescue Exception => e

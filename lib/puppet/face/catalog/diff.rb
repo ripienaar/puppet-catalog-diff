@@ -34,6 +34,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
       default_to { "10" }
     end
 
+    option "--threads=" do
+      summary "The number of connections for the compiles to use"
+      default_to { "10" }
+    end
+
     description <<-'EOT'
       Prints the differences between catalogs compiled by different puppet master to help
       during migrating to a new Puppet version.
@@ -112,7 +117,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         # User passed use two hostnames
         old_catalogs = Dir.mktmpdir("#{catalog1}-")
         new_catalogs = Dir.mktmpdir("#{catalog2}-")
-        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth])
+        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth], :threads => options[:threads])
         diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,options)
         nodes = diff_output
         nodes[:pull_output] = pull_output
