@@ -1,0 +1,76 @@
+<%# General overview %>
+# Diff Overview
+<% pull_output = @nodes['pull_output'] %>
+__<%= "%s" % pull_output['failed_nodes_total'] %>__ nodes out of <%= pull_output['total_nodes'] %> failed to compile their catalog  
+This is a <%= '%.2f' % pull_output['total_percentage'] %>% failure rate across your infrastructure  
+## Files in need of the most work:
+<% pull_output['failed_to_compile_files'] && pull_output['failed_to_compile_files'].each do |failed| %>
+<% failed.each do |file_path,number| %>
++ <%= number %> nodes failed to compile `<%= file_path %>`
+<% end %>
+<% end %>
+## Example compile errors
+<% pull_output['example_compile_errors'] && pull_output['example_compile_errors'].each do |examples| %>
+<% examples.each do |error,node_name| %>
+### <%= node_name %>
+```shell
+<%= error %>  
+```
+<% end %>
+<% end %>
+<%# Per node overview %>
+<% unless @nodes['most_changed'].empty? %>
+# Nodes with changes by percent
+This is node breakdown by average changes per catalog per node.
+<% end %>
+<% @nodes['most_changed'].each do |summary| %>
+<% summary.each do |node,percent| %>
+1. `<%= node %>` has changed <%=  '%.2f' % percent.to_f %>%  
+<% end %>
+<% end %>
+<% unless @nodes['most_differences'].empty? %>
+# Nodes with changes by number
+This is node breakdown by total differences per catalog per node.
+<% end %>
+<% @nodes['most_differences'].each do |summary| %>
+<% summary.each do |node,number| %>
+1. `<%= node %>` has <%= number %> changes  
+<% end %>
+<% end %>
+
+# Node breakdown
+<% @nodes.each do |node,summary| %>
+<% if summary.is_a?(Array) %>
+<% next %>
+<% elsif summary.is_a?(Hash) %>
+## <%= node %>
+<%# Show the summary %>
++ <%= "%s" % summary['total_resources_in_new'] %> resources found in new catalog  
++ <%= "%s" % summary['total_resources_in_old'] %> resources found in old catalog  
++ <%= "%s"% summary['node_differences'] %> total changes for this node (<%= '%.2f' % summary['catalog_percentage_changed'].to_f%>% of its catalog)  
+<%# Format the diff output %>
+<% if summary['differences_as_diff'] %>
+<% next if summary['differences_as_diff'].empty? %>
+### Resource Differences
+<% summary['differences_as_diff'].collect do |resource,diff| %>
+#### <%= resource %>
+```diff
+<%= resource %>  
+<%= diff.join("  \n") %>
+```
+<% end.join("  \n") %>
+<% end %>
+<% if summary['content_differences'] %>
+<% next if summary['content_differences'].empty? %>
+### Content Differences
+<% summary['content_differences'].collect do |resource,diff| %>
+#### <%= resource %>
+```diff
+<%= resource %>  
+<%= diff.gsub("\n","  \n") %>
+```
+<% end.join("  \n") %>
+<% end %>
+<% end %>
+<% end %>
+
