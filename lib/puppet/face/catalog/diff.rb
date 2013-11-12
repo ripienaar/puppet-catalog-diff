@@ -7,7 +7,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     summary "Compare catalogs from different puppet versions."
     arguments "<catalog1> <catalog2>"
 
-    option "--fact_search" do
+    option "--fact_search=" do
       summary "Fact search used to filter which catalogs are compiled and compared"
 
       default_to { 'kernel=Linux' }
