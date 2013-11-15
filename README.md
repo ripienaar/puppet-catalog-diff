@@ -100,7 +100,7 @@ masters. This option defaults to 10 and in testing 50 threads seemed correct for
 4 masters with two load balancers.
 
 ## Fact search
-You can pass `--fact\_search` to filter the list of nodes based on a single fact value.
+You can pass `--fact_search` to filter the list of nodes based on a single fact value.
 This currently defaults to `kernel=Linux` if you do not pass it. The yaml cache will be
 queried to find all nodes whose fact matches that value. Once a list of nodes with known
 facts is compiled a rest or puppetdb connection ( as mentioned above) filters the list
@@ -112,10 +112,10 @@ Once each catalog is compiled , it is saved to the /tmp directory on the system 
 face will then automatically calculate the differences between the catalogs. Once this
 is complete a summary of number of nodes with changes as well as nodes whose catalog
 would not compile are listed. You can modify the number of nodes shown here using
-`--changed\_depth` option.
+`--changed_depth` option.
 
 ## Output Report
-You can save the last report as json to a specific location using "`--output\_report`"
+You can save the last report as json to a specific location using "`--output_report`"
 This report will contain the structured data in the format of running this command
 with `--render-as json`. As example Rakefile is provided with a `docs` task for
 converting this report to (github flavored) markdown. The script above also will
@@ -157,7 +157,6 @@ You can get some inline help with:
 
     puppet man catalog
 
-Who?
-----
-R.I.Pienaar <rip@devco.net> / www.devco.net / @ripienaar
-Zack Smith <zack@puppetlabs.com> / @acidprime
+# Authors
+R.I.Pienaar <rip@devco.net> / www.devco.net / @ripienaar  
+Zack Smith <zack@puppetlabs.com> / @acidprime  
