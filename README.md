@@ -12,37 +12,117 @@ touching any of your nodes.
 This tool is delivered as a Puppet Face. It thus requires a Puppet installation
 to properly run.
 
-The diff tool recognizes catalogs in yaml, marshall, or pson format.
+The diff tool recognizes catalogs in yaml, marshall, or pson format.Currently automatic
+generation of the catalogs is done in the pson format.
 
 The tool can automatically compile the catalogs for both your new and older servers.
 It can ask the master to use the yaml cache to compile the catalog for the last
-known environment with the last known facts. It can then validate against th facts
+known environment with the last known facts. It can then validate against the rest
 terminus ( or by proxy puppetdb ) that the node is still active. This filtered list
-will then be processed for differences in that catalog
+should contain only machines that have not been decomissioned in puppetdb (important
+as complaining their catalogs would also reactive them otherwise ).
 
 # Usage
+Before starting you need to copy or mount the contents of your current master's
+yamldir on the new,diff and old nodes.If you have multiple masters then combine
+the yamldirs of all nodes to give the fullest picture of all catalogs
 
 
-Validation Process:
+You can retrieve the current yamldir location with the following command:
+`puppet master --configprint yamldir`. If you are using  puppet
+enterprise this directory is '/var/opt/lib/pe-puppet/yaml'. It is not required
+to use a specific "diff" node , as you could use the "new" puppet server.
 
- - Grab a catalog from your existing machine running the old version
- - Configure your new Puppet master, copy the facts from your old master
-   to the new one
- - Compile the catalog for this host on the new master:
+Once the yamldir is in place you need to allow access to the "diff" node to
+compile the catalogs for all nodes on both your old and new masters.
+In your confdir modify auth.conf to add allows for both /facts and /catalog.
+If there is an existing reference i.e. the $1 back reference for machines to
+compile their own catalog then simply add another line with the certificate
+name of the diff machine. As mentioned this can be the new master as required.
 
-      puppet master --compile fqdn > fqdn.pson
+~~~
+# allow the diff server to query facts
+path  /facts
+method find, search
+auth any
+allow diff.example.com
+~~~
 
- - Puppet puts a header in some catalogs compiled in this way, remove it if present
- - At this point you should have two different catalogs. To compare them run:
+~~~
+# allow the diff server to retrieve any catalog
+path ~ ^/catalog/([^/]+)$
+method find
+allow $1
+allow diff.example.com
+~~~
 
-      puppet catalog diff <catalog1> <catalog2>
+The /facts ACL is optional onlly if you are using puppetdb and running the query
+from the master. You can pass `--use_puppetdb` to query the puppetdb server
+directly rather then via the rest terminus. However the rest terminus should
+be the same list of nodes if they are both backed by puppetdb and so this
+option is only for environments where puppetdb is more authoritative in some
+way they the facts rest query. This option is provided for future compatibilty.
 
- - Alternatively you can process a directory containing matching files
- - i.e. path/to/old/node_name.yaml and path/to/new/node_name.yaml
-      puppet catalog diff <path/to/old> <path/to/new>
+You can run this face without root access if you run the script as the puppet user
+on the system. The following is an example script doing so. You can alternatively
+install this in your module path on Puppet 3 and higher with out the need of
+exporting RUBYLIB. One example of when you would need to run this as non
+root would be if you mounted the yamldir via NFS and had root squash enabled.
 
-Example Output:
+```shell
+#!/bin/bash -x
+if !-d "${HOME}/puppet-catalog-diff" ; then
+  git clone https://github.com/acidprime/puppet-catalog-diff.git
+fi
 
+# These should be changed for puppet enterprise
+export RUBYLIB="${HOME}/puppet-catalog-diff/lib/"
+export YAMLDIR='/var/lib/puppet/yaml'
+export SSLDIR='/var/lib/puppet/ssl'
+export PUSER='puppet'
+[ $USER == $PUSER ] || exit 1
+time puppet catalog diff puppet2.example.com puppet3.example.com \
+--show_resource_diff \
+--content_diff \
+--yamldir $YAMLDIR \
+--ssldir $SSLDIR \
+--changed_depth 1000 \
+--configtimeout 1000 \
+--output_report "${HOME}/lastrun-$$.json" \
+--debug \
+\ #--fact_search kernel='Darwin' \
+--threads 50 | tee -a lastrun-$$.log
+```
+## Multi threaded compile requests
+You can change the number of concurrent connections to the masters by passing an interger
+to the `--threads` option. This will balence the catalogs evenly on the old and new
+masters. This option defaults to 10 and in testing 50 threads seemed correct for
+4 masters with two load balancers.
+
+## Fact search
+You can pass `--fact\_search` to filter the list of nodes based on a single fact value.
+This currently defaults to `kernel=Linux` if you do not pass it. The yaml cache will be
+queried to find all nodes whose fact matches that value. Once a list of nodes with known
+facts is compiled a rest or puppetdb connection ( as mentioned above) filters the list
+to only nodes who are "active" based typically on puppetdb. For more information on
+deactiving nodes in puppetdb see [this article](http://docs.puppetlabs.com/puppetdb/latest/maintain_and_tune.html)
+
+## Changed depth
+Once each catalog is compiled , it is saved to the /tmp directory on the system and the
+face will then automatically calculate the differences between the catalogs. Once this
+is complete a summary of number of nodes with changes as well as nodes whose catalog
+would not compile are listed. You can modify the number of nodes shown here using
+`--changed\_depth` option.
+
+## Output Report
+You can save the last report as json to a specific location using "`--output\_report`"
+This report will contain the structured data in the format of running this command
+with `--render-as json`. As example Rakefile is provided with a `docs` task for
+converting this report to (github flavored) markdown. The script above also will
+save the output with escaped color. If you want to view that text report run
+`less -r lastrun-$$.log`
+
+## Output description
 During the transition of 0.24.x to 0.25.x there was a serialization bug that
 resulted in unexpected file content changes, I've recreated this bug in a tiny
 2 resource catalog, the output below shows how this tool would have highlighted
@@ -77,45 +157,7 @@ You can get some inline help with:
 
     puppet man catalog
 
-Installation?
--------------
-
-This version works best with Puppet 3.0.0 or newer, simply install it with the
-module tool into your module path:
-
-    # puppet module install ripienaar-catalog_diff
-    # puppet man catalog diff
-
-Example Usage
-----------
-```shell
-#!/bin/bash
-test -f /tmp/2.7.23_catalogs && rm -rf /tmp/2.7.23_catalogs
-test -f /tmp/3.3.1_catalogs && rm -rf /tmp/3.3.1_catalogs
-export RUBYLIB=/etc/puppet/modules/catalog_diff/lib/
-time puppet catalog pull /tmp/2.7.23_catalogs /tmp/3.3.1_catalogs kernel=Linux \
---old_server puppet27.example.com \
---new_server puppet30.example.com \
---debug \
---trace \
---yamldir /var/lib/puppet/yaml \
---ssldir /var/lib/puppet/ssl
-time puppet catalog diff /tmp/2.7.23_catalogs /tmp/3.3.1_catalogs \
---debug \
---show_resource_diff \
---content_diff \
---trace
-```
-
-Changelog?
-----------
-
- - 2012/10/20 - Make it a puppet face
-
- - 2010/10/19 - Change options and logic so it's easier to use comparing catalogs
-                from the same version of puppet
-
-
 Who?
 ----
 R.I.Pienaar <rip@devco.net> / www.devco.net / @ripienaar
+Zack Smith <zack@puppetlabs.com> / @acidprime

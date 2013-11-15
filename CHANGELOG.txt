@@ -1,0 +1,6 @@
+* 2013/11/15 - Refactor to make the tool automatically download catalogs from masters
+
+* 2012/10/20 - Make it a puppet face
+
+* 2010/10/19 - Change options and logic so it's easier to use comparing catalogs
+                from the same version of puppet
