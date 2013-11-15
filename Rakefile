@@ -4,7 +4,6 @@ desc "Build final report"
 task :build do
   @nodes = load_json("lastrun.json")
   build_file("Report.md")
-  puts GitHub::Markup.render(file, File.read("1ef92b164bfa79591f27/foo.md"))
 end
 
 def load_json(filename)
