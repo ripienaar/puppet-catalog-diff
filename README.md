@@ -19,12 +19,12 @@ The tool can automatically compile the catalogs for both your new and older serv
 It can ask the master to use the yaml cache to compile the catalog for the last
 known environment with the last known facts. It can then validate against the rest
 terminus ( or by proxy puppetdb ) that the node is still active. This filtered list
-should contain only machines that have not been decomissioned in puppetdb (important
-as complaining their catalogs would also reactive them otherwise ).
+should contain only machines that have not been decommissioned in puppetdb (important
+as complaining their catalogs would also reactive them and their exports otherwise ).
 
 # Usage
 Before starting you need to copy or mount the contents of your current master's
-yamldir on the new,diff and old nodes.If you have multiple masters then combine
+yamldir on the diff node,new master and old master.If you have multiple masters then combine
 the yamldirs of all nodes to give the fullest picture of all catalogs
 
 
@@ -61,7 +61,7 @@ from the master. You can pass `--use_puppetdb` to query the puppetdb server
 directly rather then via the rest terminus. However the rest terminus should
 be the same list of nodes if they are both backed by puppetdb and so this
 option is only for environments where puppetdb is more authoritative in some
-way they the facts rest query. This option is provided for future compatibilty.
+way they the facts rest query. This option is provided for future compatibility.
 
 You can run this face without root access if you run the script as the puppet user
 on the system. The following is an example script doing so. You can alternatively
