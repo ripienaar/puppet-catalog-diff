@@ -1,5 +1,4 @@
 # Overview
-=====
 A tool to compare two Puppet catalogs.
 
 While upgrading versions of Puppet or refactoring Puppet code you want to
