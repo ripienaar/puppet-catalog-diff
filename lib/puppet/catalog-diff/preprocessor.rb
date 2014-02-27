@@ -104,6 +104,7 @@ module Puppet::CatalogDiff
         end
 
         if resource[:parameters].include?(:content) and resource[:parameters][:content] != false
+          resource[:parameters][:content] = Hash[resource[:parameters][:content].sort].to_pson if resource[:parameters][:content].class.to_s == 'Hash'
           resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
         end
 
