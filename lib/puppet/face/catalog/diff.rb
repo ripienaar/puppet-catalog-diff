@@ -81,7 +81,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_invoked do |catalog1, catalog2, options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "differ.rb"))
 
-      Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+      res = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
+      puts res
+      exit(1) if res
     end
   end
 end
