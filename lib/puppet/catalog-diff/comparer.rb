@@ -64,12 +64,6 @@ module Puppet::CatalogDiff
         sort_dependencies!(new_resource[:parameters])
         sort_dependencies!(resource[:parameters])
 
-        # ignore expected content changes on /etc/mcollective/facts.yaml
-        if resource[:type].downcase == 'file' and resource[:title].to_s == '/etc/mcollective/facts.yaml'
-          resource[:parameters].delete(:content)
-          new_resource[:parameters].delete(:content)
-        end
-
         unless new_resource[:parameters] == resource[:parameters]
           diffs = true
           if options[:show_resource_diff]
