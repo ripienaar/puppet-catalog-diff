@@ -60,17 +60,21 @@ module Puppet::CatalogDiff
       titles[:to] = extract_titles(to)
       titles[:from] = extract_titles(from)
 
+      had_diffs = false
+
       puts "Resource counts:"
       puts "\tOld: #{titles[:from].size}"
       puts "\tNew: #{titles[:to].size}"
       puts
 
+      had_diffs = true if titles[:from].size != titles[:to].size
+
       puts "Resource title diffs:"
-      print_resource_diffs(titles[:to], titles[:from])
+      had_diffs = true if print_resource_diffs(titles[:to], titles[:from])
       puts
 
-      compare_resources(from, to, options)
-      nil
+      had_diffs = true if compare_resources(from, to, options)
+      return had_diffs
     end
   end
 end
