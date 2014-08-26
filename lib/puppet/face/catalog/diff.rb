@@ -17,6 +17,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'Do not print classes in resource diffs'
     end
 
+    option '--ignore-resource RESOURCE' do
+      summary 'Ignore the given resource (in Type[title] format)'
+    end
+
     description <<-'EOT'
       Prints the differences between catalogs compiled by different puppet master to help
       during migrating to a new Puppet version.
