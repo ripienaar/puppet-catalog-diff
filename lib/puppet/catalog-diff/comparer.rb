@@ -64,7 +64,7 @@ module Puppet::CatalogDiff
         sort_dependencies!(new_resource[:parameters])
         sort_dependencies!(resource[:parameters])
 
-        next if resource[:type] << '[' <<  resource[:title].to_s << ']' == options[:ignore_resource]
+        next if options[:ignore_resources].include? resource[:type] << '[' <<  resource[:title].to_s << ']'
 
         unless new_resource[:parameters] == resource[:parameters]
           diffs = true

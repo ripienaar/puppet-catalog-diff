@@ -17,8 +17,8 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'Do not print classes in resource diffs'
     end
 
-    option '--ignore-resource RESOURCE' do
-      summary 'Ignore the given resource (in Type[title] format)'
+    option '--ignore-resources RESOURCE' do
+      summary 'Ignore the given resource(s) in Type[title] format; specify multiple resources separated by |'
     end
 
     description <<-'EOT'
@@ -85,8 +85,13 @@ Puppet::Face.define(:catalog, '0.0.1') do
     when_invoked do |catalog1, catalog2, options|
       require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "catalog-diff", "differ.rb"))
 
+      # Faces don't currently have support for passing an option multiple times,
+      # so we use a separator and split into an array here
+      if options[:ignore_resources].include? '|'
+        options[:ignore_resources] = options[:ignore_resources].split('|')
+      end
+
       res = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
-      puts res
       exit(1) if res
     end
   end
