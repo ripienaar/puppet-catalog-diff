@@ -87,9 +87,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       # Faces don't currently have support for passing an option multiple times,
       # so we use a separator and split into an array here
-      if options[:ignore_resources] && options[:ignore_resources].include?('|')
-        options[:ignore_resources] = options[:ignore_resources].split('|')
-      end
+      options[:ignore_resources] = options[:ignore_resources].split('|') if options[:ignore_resources]
 
       res = Puppet::CatalogDiff::Differ.new(catalog1, catalog2).diff(options)
       exit(1) if res
