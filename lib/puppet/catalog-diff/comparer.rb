@@ -121,12 +121,12 @@ module Puppet::CatalogDiff
     def print_resource_diffs(r1, r2)
       diffs = false
       puts "Only in old:"
-      (r2 - r1).each do |r|
+      (r2 - r1).sort.each do |r|
         puts "\t#{r}"
         diffs = true
       end
       puts "Only in new:"
-      (r1 - r2).each do |r|
+      (r1 - r2).sort.each do |r|
         puts "\t#{r}"
         diffs = true
       end
