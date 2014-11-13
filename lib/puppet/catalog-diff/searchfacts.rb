@@ -41,9 +41,19 @@ module Puppet::CatalogDiff
 
 
     def find_nodes_rest(server)
-        connection = Puppet::Network::HttpPool.http_instance(server,'8140')
-        unless filtered = PSON.load(connection.request_get("/v2/facts_search/search?facts.#{@args}", {"Accept" => 'pson'}).body)
-          raise "Error parsing pson output of fact search"
+        endpoint = "/v2/facts_search/search?facts.#{@args}"
+
+        begin
+          connection = Puppet::Network::HttpPool.http_instance(server,'8140')
+          facts_object = connection.request_get(endpoint, {"Accept" => 'pson'}).body
+        rescue Exception => e
+          raise "Error retrieving facts from #{server}: #{e.message}"
+        end
+
+        begin
+          filtered = PSON.load(facts_object)
+        rescue Exception => e
+          raise "Received invalid data from facts endpoint: #{e.message}"
         end
         filtered
     end

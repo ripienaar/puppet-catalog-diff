@@ -35,18 +35,19 @@ module Puppet::CatalogDiff
 
     def compile_catalog(node_name,server)
       environment = lookup_environment(node_name)
+      endpoint = "/#{environment}/catalog/#{node_name}"
       Puppet.debug("Connecting to server: #{server}")
-      connection = Puppet::Network::HttpPool.http_instance(server,'8140')
-      unless catalog = connection.request_get("/#{environment}/catalog/#{node_name}", {"Accept" => 'pson'}).body
-        #unless catalog = Puppet::Resource::Catalog.indirection.find(node_name,:environment => environment)
-        raise "Could not compile catalog for #{node_name} in environment #{environment}"
+      begin
+        connection = Puppet::Network::HttpPool.http_instance(server,'8140')
+        catalog = connection.request_get(endpoint, {"Accept" => 'pson'}).body
+      rescue
+        raise "Failed to retrieve catalog for #{node_name} from #{server} in environment #{environment}: #{e.message}"
       end
       catalog
     end
 
     def render_pson(catalog)
       unless pson = PSON::pretty_generate(catalog, :allow_nan => true, :max_nesting => false)
-        #unless pson = PSON::pretty_generate(catalog.to_resource, :allow_nan => true, :max_nesting => false)
        raise "Could not render catalog as pson, #{catalog}"
       end
       pson
@@ -56,6 +57,8 @@ module Puppet::CatalogDiff
       File.open("#{save_directory}/#{node_name}.#{extention}","w") do |f|
         f.write(catalog)
       end
+    rescue Exception => e
+      raise "Failed to save catalog for #{node_name} in #{save_directory}: #{e.message}"
     end
 
   end
