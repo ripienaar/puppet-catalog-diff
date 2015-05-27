@@ -69,9 +69,9 @@ module Puppet::CatalogDiff
         port = Puppet::Util::Puppetdb.port
         use_ssl = port != 8080
         connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,port,use_ssl)
-        fact_query = @args.split("=")
-        #json_query = URI.escape(["=", ["fact", fact_query[0]], fact_query[1]].to_json)
-        json_query = URI.escape(["=", ["node","active"], true].to_json)
+        base_query = ["and", ["=", ["node","active"], true]]
+        query = base_query.concat(@facts.map { |k, v| ["=", ["fact", k], v] })
+        json_query = URI.escape(query.to_json)
         unless filtered = PSON.load(connection.request_get("/v2/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
