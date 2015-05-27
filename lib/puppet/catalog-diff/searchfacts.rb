@@ -15,7 +15,7 @@ module Puppet::CatalogDiff
      if options[:use_puppetdb]
        active_nodes = find_nodes_puppetdb()
      else
-       active_nodes = find_nodes_rest(options[:old_server])
+       active_nodes = find_nodes_rest(options[:old_server].split('/')[0])
      end
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
