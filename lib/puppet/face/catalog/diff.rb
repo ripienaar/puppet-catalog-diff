@@ -29,6 +29,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'Do not print classes in resource diffs'
     end
 
+    option "--filter_local" do
+      summary "Use local YAML node files to filter out queried nodes"
+    end
+
     option "--changed_depth=" do
       summary "The number of nodes to display sorted by changes"
       default_to { "10" }

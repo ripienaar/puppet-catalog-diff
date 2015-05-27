@@ -20,8 +20,11 @@ module Puppet::CatalogDiff
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
      end
-     found_nodes = yaml_cache.select { |node| active_nodes.include?(node) }
-     found_nodes
+     if options[:filter_local]
+       yaml_cache.select { |node| active_nodes.include?(node) }
+     else
+       active_nodes
+     end
     end
 
     def find_nodes_local(fact,value)
