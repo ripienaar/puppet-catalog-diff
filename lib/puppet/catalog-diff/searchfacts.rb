@@ -11,10 +11,12 @@ module Puppet::CatalogDiff
     def find_nodes(options = {})
      # Pull all nodes from the yaml cache
      # Then validate they are active nodes against the rest of puppetdb api
+     old_server = options[:old_server].split('/')[0]
+     old_env = options[:old_server].split('/')[1]
      if options[:use_puppetdb]
-       active_nodes = find_nodes_puppetdb()
+       active_nodes = find_nodes_puppetdb(old_env)
      else
-       active_nodes = find_nodes_rest(options[:old_server].split('/')[0])
+       active_nodes = find_nodes_rest(old_server)
      end
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
@@ -64,18 +66,19 @@ module Puppet::CatalogDiff
         filtered
     end
 
-    def find_nodes_puppetdb()
+    def find_nodes_puppetdb(env)
         require 'puppet/util/puppetdb'
         port = Puppet::Util::Puppetdb.port
         use_ssl = port != 8080
         connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,port,use_ssl)
         base_query = ["and", ["=", ["node","active"], true]]
+        base_query.concat([["=", "catalog-environment", env]]) if env
         query = base_query.concat(@facts.map { |k, v| ["=", ["fact", k], v] })
         json_query = URI.escape(query.to_json)
-        unless filtered = PSON.load(connection.request_get("/v2/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
+        unless filtered = PSON.load(connection.request_get("/v4/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
-        names = filtered.map { |node| node['name'] }
+        names = filtered.map { |node| node['certname'] }
         names
     end                                                                                                                            end
 end
