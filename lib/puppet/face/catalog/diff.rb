@@ -31,6 +31,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     option "--filter_local" do
       summary "Use local YAML node files to filter out queried nodes"
+    end
 
     option "--use_puppetdb" do
       summary "Use puppetdb to do the fact search instead of the rest api"
