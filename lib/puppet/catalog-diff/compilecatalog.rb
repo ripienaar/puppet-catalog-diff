@@ -34,7 +34,8 @@ module Puppet::CatalogDiff
     end
 
     def compile_catalog(node_name,server)
-      environment = lookup_environment(node_name)
+      server,environment = server.split('/')
+      environment ||= lookup_environment(node_name)
       endpoint = "/#{environment}/catalog/#{node_name}"
       Puppet.debug("Connecting to server: #{server}")
       begin
