@@ -4,14 +4,13 @@ require 'json'
 module Puppet::CatalogDiff
   class SearchFacts
 
-    def initialize(args)
-      @args = args
+    def initialize(facts)
+      @facts = Hash[facts.split(',').map { |f| f.split('=') }]
     end
 
     def find_nodes(options = {})
      # Pull all nodes from the yaml cache
      # Then validate they are active nodes against the rest of puppetdb api
-     yaml_cache = find_nodes_local(*@args.split("="))
      if options[:use_puppetdb]
        active_nodes = find_nodes_puppetdb()
      else
@@ -21,13 +20,14 @@ module Puppet::CatalogDiff
        raise "No active nodes were returned from your fact search"
      end
      if options[:filter_local]
+       yaml_cache = find_nodes_local()
        yaml_cache.select { |node| active_nodes.include?(node) }
      else
        active_nodes
      end
     end
 
-    def find_nodes_local(fact,value)
+    def find_nodes_local
       Puppet[:clientyamldir] = Puppet[:yamldir]
       if Puppet::Node.respond_to? :terminus_class
         Puppet::Node.terminus_class = :yaml
@@ -36,7 +36,9 @@ module Puppet::CatalogDiff
         Puppet::Node.indirection.terminus_class = :yaml
         nodes = Puppet::Node.indirection.search("*")
       end
-      unless filtered =  nodes.select {|n| n.parameters[fact] == value }.map{ |n| n.name }
+      unless filtered =  nodes.select {|n|
+          @facts.select { |f, v| n[f] == v }.size == @facts.size
+        }.map{ |n| n.name }
         raise "No matching nodes found using yaml terminus"
       end
       filtered
@@ -44,7 +46,8 @@ module Puppet::CatalogDiff
 
 
     def find_nodes_rest(server)
-        endpoint = "/v2/facts_search/search?facts.#{@args}"
+        query = @facts.map { |k, v| "facts.#{k}=#{v}" }.join('&')
+        endpoint = "/v2/facts_search/search?#{query}"
 
         begin
           connection = Puppet::Network::HttpPool.http_instance(server,'8140')
@@ -63,9 +66,9 @@ module Puppet::CatalogDiff
 
     def find_nodes_puppetdb()
         connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,'8081')
-        fact_query = @args.split("=")
-        #json_query = URI.escape(["=", ["fact", fact_query[0]], fact_query[1]].to_json)
-        json_query = URI.escape(["=", ["node","active"], true].to_json)
+        base_query = ["and", ["=", ["node","active"], true]]
+        query = base_query.concat(@facts.map { |k, v| ["=", ["fact", k], v] })
+        json_query = URI.escape(query.to_json)
         unless filtered = PSON.load(connection.request_get("/v2/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
