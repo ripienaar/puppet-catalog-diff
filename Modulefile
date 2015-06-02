@@ -1,5 +1,5 @@
 name 'zack-catalog_diff'
-version '1.5.0'
+version '1.5.1'
 source 'git@github.com:acidprime/puppet-catalog-diff.git'
 author 'R.I.Pienaar and Zack Smith'
 license 'Apache'

@@ -1,3 +1,6 @@
+v1.5.1 - Clayton O'Neill 
+  * Fix Typo
+    - https://github.com/acidprime/puppet-catalog-diff/pull/6
 v1.5.0 - Raphaël Pinson + James Sweeny
   * Multiple facts in filter
     - https://github.com/acidprime/puppet-catalog-diff/pull/5
