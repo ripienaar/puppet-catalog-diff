@@ -1,6 +1,13 @@
-* 2013/11/15 - Refactor to make the tool automatically download catalogs from masters
-
-* 2012/10/20 - Make it a puppet face
-
-* 2010/10/19 - Change options and logic so it's easier to use comparing catalogs
-                from the same version of puppet
+v1.5.0 - Raphaël Pinson + James Sweeny
+  * Multiple facts in filter
+    - https://github.com/acidprime/puppet-catalog-diff/pull/5
+  * Allow for filtering of local yaml cache
+    - https://github.com/acidprime/puppet-catalog-diff/pull/4
+  * Allow you to pass environment
+    - https://github.com/acidprime/puppet-catalog-diff/pull/2
+  * Update error handling
+    - https://github.com/acidprime/puppet-catalog-diff/pull/1
+  * Update puppedb option handling
+    - https://github.com/acidprime/puppet-catalog-diff/commit/c567a48fe75715a1d30e1d02dcc49c339b470cb8
+v1.0.0 - Zack Smith
+  * Intial fork and release of RIAAs build
