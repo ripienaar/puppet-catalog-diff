@@ -1,3 +1,6 @@
+v1.5.2 - Raphaël Pinson
+  * Improve puppetdb requests
+    - https://github.com/acidprime/puppet-catalog-diff/pull/7
 v1.5.1 - Clayton O'Neill 
   * Fix Typo
     - https://github.com/acidprime/puppet-catalog-diff/pull/6
