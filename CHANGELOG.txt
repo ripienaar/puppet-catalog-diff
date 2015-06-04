@@ -1,3 +1,7 @@
+v1.6.0 - Raphaël Pinson
+  * The generation date (global info)
+  * Two node fields: old_version and new_version, using the catalog versions.
+    - https://github.com/acidprime/puppet-catalog-diff/pull/8
 v1.5.2 - Raphaël Pinson
   * Improve puppetdb requests
     - https://github.com/acidprime/puppet-catalog-diff/pull/7
