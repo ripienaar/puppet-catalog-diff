@@ -24,8 +24,11 @@ module Puppet::CatalogDiff
 
     def diff(options = {})
       from = []
+      from_meta = {}
       to   = []
-      { from_file => from, to_file => to}.each do |r,v|
+      to_meta = {}
+      { from_file => [ from, from_meta ], to_file => [ to, to_meta ]}.each do |r,a|
+        v, m = a
         unless File.exist?(r)
           raise "Cannot find resources in #{r}"
         end
@@ -42,6 +45,8 @@ module Puppet::CatalogDiff
 	else
 	  raise "Provide catalog with the approprtiate file extension, valid extensions are pson, yaml and marshal"
         end
+
+        m[:version] = tmp.version
 
         if @version == "0.24"
           convert24(tmp, v)
@@ -63,6 +68,8 @@ module Puppet::CatalogDiff
       titles[:from] = extract_titles(from)
 
       output = {}
+      output[:old_version] = from_meta[:version]
+      output[:new_version] = to_meta[:version]
       output[:total_resources_in_old] = titles[:from].size
       output[:total_resources_in_new] = titles[:to].size
 
