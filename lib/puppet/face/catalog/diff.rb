@@ -1,6 +1,14 @@
 require 'puppet/face'
 require  'thread'
 require 'json'
+
+begin
+  require 'parallel'
+  HAS_PARALLEL_GEM = true
+rescue LoadError
+  HAS_PARALLEL_GEM = false
+end
+
 Puppet::Face.define(:catalog, '0.0.1') do
 
   action :diff do
@@ -103,19 +111,29 @@ Puppet::Face.define(:catalog, '0.0.1') do
         found_catalogs = Puppet::CatalogDiff::FindCatalogs.new(catalog1,catalog2).return_catalogs(options)
         new_catalogs = found_catalogs.keys
 
-        thread_count = 1
-        mutex = Mutex.new
-
-        thread_count.times.map {
-          Thread.new(nodes,new_catalogs,options) do |nodes,new_catalogs,options|
-            while new_catalog = mutex.synchronize { new_catalogs.pop }
-              node_name    = File.basename(new_catalog,File.extname(new_catalog))
-              old_catalog  = found_catalogs[new_catalog]
-              node_summary = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
-              mutex.synchronize { nodes[node_name] = node_summary }
-            end
+        if HAS_PARALLEL_GEM
+          results = Parallel.map(new_catalogs) do |new_catalog|
+            node_name    = File.basename(new_catalog,File.extname(new_catalog))
+            old_catalog  = found_catalogs[new_catalog]
+            node_summary = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
+            [ node_name, node_summary ]
           end
-        }.each(&:join)
+          nodes = Hash[results]
+        else
+          thread_count = 1
+          mutex = Mutex.new
+
+          thread_count.times.map {
+            Thread.new(nodes,new_catalogs,options) do |nodes,new_catalogs,options|
+              while new_catalog = mutex.synchronize { new_catalogs.pop }
+                node_name    = File.basename(new_catalog,File.extname(new_catalog))
+                old_catalog  = found_catalogs[new_catalog]
+                node_summary = Puppet::CatalogDiff::Differ.new(old_catalog, new_catalog).diff(options)
+                mutex.synchronize { nodes[node_name] = node_summary }
+              end
+            end
+          }.each(&:join)
+        end
       elsif File.file?(catalog1) && File.file?(catalog2)
         # User passed us two files
         node_name = File.basename(catalog2,File.extname(catalog2))
