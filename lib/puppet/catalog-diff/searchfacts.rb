@@ -73,7 +73,24 @@ module Puppet::CatalogDiff
         connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,port,use_ssl)
         base_query = ["and", ["=", ["node","active"], true]]
         base_query.concat([["=", "catalog-environment", env]]) if env
-        query = base_query.concat(@facts.map { |k, v| ["=", ["fact", k], v] })
+        real_facts = @facts.select { |k, v| !v.nil? }
+        query = base_query.concat(real_facts.map { |k, v| ["=", ["fact", k], v] })
+        classes = @facts.select { |k, v| v.nil? }.keys
+        classes.each do |c|
+          capit = c.split('::').map{ |n| n.capitalize }.join('::')
+          query = query.concat(
+            [["in", "certname",
+              ["extract", "certname",
+                ["select-resources",
+                  ["and",
+                    ["=", "type", "Class"],
+                    ["=", "title", capit ],
+                  ],
+                ],
+              ],
+            ]]
+          )
+        end
         json_query = URI.escape(query.to_json)
         unless filtered = PSON.load(connection.request_get("/v4/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
