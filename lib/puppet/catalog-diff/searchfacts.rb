@@ -75,7 +75,7 @@ module Puppet::CatalogDiff
         base_query.concat([["=", "catalog-environment", env]]) if env
         real_facts = @facts.select { |k, v| !v.nil? }
         query = base_query.concat(real_facts.map { |k, v| ["=", ["fact", k], v] })
-        classes = @facts.select { |k, v| v.nil? }.keys
+        classes = Hash[@facts.select { |k, v| v.nil? }].keys
         classes.each do |c|
           capit = c.split('::').map{ |n| n.capitalize }.join('::')
           query = query.concat(
