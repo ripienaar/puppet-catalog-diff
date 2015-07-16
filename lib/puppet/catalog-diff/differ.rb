@@ -40,6 +40,12 @@ module Puppet::CatalogDiff
           tmp = Marshal.load(File.read(r))
         when '.pson'
           tmp = PSON.load(File.read(r))
+          unless tmp.respond_to? :version
+            tmp = PSON.load({
+              'document_type' => 'Catalog',
+              'data' => PSON.load(File.read(r)),
+            }.to_pson)
+          end
         when '.json'
           tmp = PSON.load(File.read(r))
 	else
