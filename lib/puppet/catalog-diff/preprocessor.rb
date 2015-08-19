@@ -76,7 +76,7 @@ module Puppet::CatalogDiff
           end
         end
 
-        if resource[:parameters].include?(:content) and resource[:parameters][:content] != false
+        if resource[:parameters].include?(:content) and resource[:parameters][:content].is_a? String
           resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
         end
 
@@ -103,7 +103,7 @@ module Puppet::CatalogDiff
           resource[:parameters][param] = value
         end
 
-        if resource[:parameters].include?(:content) and resource[:parameters][:content] != false
+        if resource[:parameters].include?(:content) and resource[:parameters][:content].is_a? String
           resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
         end
 
