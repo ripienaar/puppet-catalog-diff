@@ -98,6 +98,12 @@ to the `--threads` option. This will balence the catalogs evenly on the old and 
 masters. This option defaults to 10 and in testing 50 threads seemed correct for
 4 masters with two load balancers.
 
+Note: When using catalog diff to compare directories, one thread per catalog
+comparison will be created.  However, since Ruby cannot take advantage of
+multiple CPUs this may be of limited use comparing local catalogs.  If the
+'parallel' gem is installed, then one process will be forked off per CPU on the
+system, allowing use of all CPUs.
+
 ## Fact search
 You can pass `--fact_search` to filter the list of nodes based on a single fact value.
 This currently defaults to `kernel=Linux` if you do not pass it. The yaml cache will be
