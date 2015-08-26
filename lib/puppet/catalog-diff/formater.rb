@@ -5,27 +5,57 @@ module Puppet::CatalogDiff
     def initialize()
     end
 
+    def format_simple(v, indent='', do_indent=false, comma='')
+      str = ''
+      str << indent if do_indent
+      v = "\"#{v}\"" unless [Fixnum, TrueClass, FalseClass].include?(v.class)
+      str << v.to_s << comma << "\n"
+    end
+
+    def format_array(v, indent='', do_indent=false, comma='')
+      str = ''
+      str << indent if do_indent
+      str << '[' << "\n"
+      v.each do |val|
+        str << format_value(val, "#{indent}     ", true, ',')
+      end
+      str << "\t     #{indent}    ]" << "\n" << comma
+    end
+
+    def format_hash(v, indent='', do_indent=false, comma='')
+      str = ''
+      str << indent if do_indent
+      str << '{' << "\n"
+      v.each do |key, val|
+        str << "\t     #{indent}     #{key} => "
+        str << format_value(val, "#{indent}     ", true, ',', key)
+      end
+      str << "\t     #{indent}    }" << "\n" << comma
+    end
+
+    def format_value(v, indent='', do_indent=false, comma='', k=nil)
+      if v.is_a?(Array)
+        format_array(v, indent, do_indent, comma)
+      elsif v.is_a?(Hash)
+        format_hash(v, indent, do_indent, comma)
+      else
+        v = v[:checksum] if (k == :content && v.is_a?(Hash))
+        format_simple(v, indent, do_indent, comma)
+      end
+    end
+
     # creates a string representation of a resource that looks like Puppet code
     def resource_to_string(resource)
       str = ''
       str << "\t" + resource[:type].downcase << '{"' <<  resource[:title].to_s << '":' << "\n"
       params = Hash[(resource[:parameters].sort_by {|k, v| k})]
       params.each_pair do |k,v|
-        if v.is_a?(Array)
-          indent = " " * k.to_s.size
-          str << "\t     #{k} => [" << "\n"
-          v.each do |val|
-            str << "\t     #{indent}     #{val}," << "\n"
-          end
-          str << "\t     #{indent}    ]" << "\n"
-        else
-          if k == :content
-            v = v[:checksum]
-          end
-          str << "\t     #{k} => #{v}" << "\n"
-        end
+        str << "\t     #{k} => "
+        indent = " " * k.to_s.size
+        str << format_value(v, indent, false, '', k)
       end
       str << "\t}\n"
+      str
     end
 
     def node_summary_header(node,summary,key)
