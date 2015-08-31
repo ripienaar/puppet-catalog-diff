@@ -19,10 +19,10 @@ class catalog_diff(
     allow         => ['$1', $diff_master, 'pe-internal-dashboard'],
   }
 
-  file { '/var/opt/lib/pe-puppet/yaml'
+  file { '/var/opt/lib/pe-puppet/yaml':
+    ensure  => directory,
     owner   => 'pe-puppet',
     group   => 'pe-puppet',
-    ensure  => directory,
     recurse => true,
     source  => 'puppet:///yaml'
   }
