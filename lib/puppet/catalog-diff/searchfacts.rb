@@ -58,7 +58,9 @@ module Puppet::CatalogDiff
         rescue Exception => e
           raise "Error retrieving facts from #{server}: #{e.message}"
         end
-
+        if facts_object.has_key?('issue_kind')
+          raise "Not authorized to retrieve facts, auth.conf edits missing?" if facts_object['issue_kind'] == 'FAILED_AUTHORIZATION'
+        end
         begin
           filtered = PSON.load(facts_object)
         rescue Exception => e
