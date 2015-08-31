@@ -67,7 +67,9 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
-         Puppet.debug(nodes)
+         if JSON.load(facts_object).has_key?('issue_kind')
+           raise "Not authorized to retrieve facts, auth.conf edits missing?" if facts_object['issue_kind'] == 'FAILED_AUTHORIZATION'
+         end
          while node_name = mutex.synchronize { nodes.pop }
             begin
               if nodes.size.odd?
