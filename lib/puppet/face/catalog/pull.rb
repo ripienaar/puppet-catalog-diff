@@ -67,6 +67,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
       thread_count.times.map {
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
+         Puppet.debug(nodes)
          while node_name = mutex.synchronize { nodes.pop }
             begin
               if nodes.size.odd?
