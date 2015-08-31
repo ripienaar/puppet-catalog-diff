@@ -18,4 +18,12 @@ class catalog_diff(
     methods       => [ 'find', 'search'],
     allow         => ['$1', $diff_master, 'pe-internal-dashboard'],
   }
+
+  file { '/var/opt/lib/pe-puppet/yaml'
+    owner   => 'pe-puppet',
+    group   => 'pe-puppet',
+    ensure  => directory,
+    recurse => true,
+    source  => 'puppet:///yaml'
+  }
 }
