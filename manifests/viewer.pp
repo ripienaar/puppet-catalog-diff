@@ -1,5 +1,7 @@
 class catalog_diff::viewer {
-  include apache
+  require apache
+  require git
+
   vcsrepo { '/var/www/html':
     ensure   => latest,
     provider => 'git',
