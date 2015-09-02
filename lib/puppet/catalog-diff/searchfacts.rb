@@ -14,10 +14,13 @@ module Puppet::CatalogDiff
      old_server = options[:old_server].split('/')[0]
      old_env = options[:old_server].split('/')[1]
      if options[:use_puppetdb]
+       Puppet.debug("Using puppetDB to find active nodes")
        active_nodes = find_nodes_puppetdb(old_env)
      elsif options[:filter_local]
+       Puppet.debug("Using YAML cache to find active nodes")
        active_nodes = find_nodes_local()
      else
+       Puppet.debug("Using Fact Reset Interface to find active nodes")
        active_nodes = find_nodes_rest(old_server)
      end
      if active_nodes.empty?
