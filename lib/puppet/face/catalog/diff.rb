@@ -143,7 +143,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         # User passed use two hostnames
         old_catalogs = Dir.mktmpdir("#{catalog1.gsub('/', '_')}-")
         new_catalogs = Dir.mktmpdir("#{catalog2.gsub('/', '_')}-")
-        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth], :threads => options[:threads], :use_puppetdb => options[:use_puppetdb])
+        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options)
         diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,options)
         nodes = diff_output
         FileUtils.rm_rf(old_catalogs)
