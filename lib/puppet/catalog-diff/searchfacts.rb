@@ -38,8 +38,8 @@ module Puppet::CatalogDiff
         Puppet::Node.indirection.terminus_class = :yaml
         nodes = Puppet::Node.indirection.search("*")
       end
-      unless filtered =  nodes.select {|n|
-          @facts.select { |f, v| n[f] == v }.size == @facts.size
+      unless filtered =  nodes.select {|node|
+          @facts.select { |fact, v| node.facts.values[fact] == v }.size == @facts.size
         }.map{ |n| n.name }
         raise "No matching nodes found using yaml terminus"
       end
