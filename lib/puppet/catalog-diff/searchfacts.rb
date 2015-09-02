@@ -15,18 +15,15 @@ module Puppet::CatalogDiff
      old_env = options[:old_server].split('/')[1]
      if options[:use_puppetdb]
        active_nodes = find_nodes_puppetdb(old_env)
+     elsif options[:filter_local]
+       active_nodes = find_nodes_local()
      else
        active_nodes = find_nodes_rest(old_server)
      end
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
      end
-     if options[:filter_local]
-       yaml_cache = find_nodes_local()
-       yaml_cache.select { |node| active_nodes.include?(node) }
-     else
-       active_nodes
-     end
+     active_nodes
     end
 
     def find_nodes_local
