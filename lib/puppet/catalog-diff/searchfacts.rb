@@ -16,13 +16,14 @@ module Puppet::CatalogDiff
      if options[:use_puppetdb]
        Puppet.debug("Using puppetDB to find active nodes")
        active_nodes = find_nodes_puppetdb(old_env)
-     elsif options[:filter_local]
-       Puppet.debug("Using YAML cache to find active nodes")
-       yaml_cache = find_nodes_local()
-       active_nodes = yaml_cache
      else
        Puppet.debug("Using Fact Reset Interface to find active nodes")
        active_nodes = find_nodes_rest(old_server)
+     end
+     if options[:filter_local]
+       Puppet.debug("Using YAML cache to find active nodes")
+       yaml_cache = find_nodes_local()
+       active_nodes = yaml_cache
      end
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
