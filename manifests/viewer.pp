@@ -34,7 +34,6 @@ class catalog_diff::viewer (
     username    => 'puppet',
     cryptpasswd => ht_sha1($password),
     target      => '/var/www/.htpasswd',
-    require     => Class['apache'],
   }
 
   vcsrepo { '/var/www/diff':
@@ -42,6 +41,5 @@ class catalog_diff::viewer (
     provider => 'git',
     source   => $remote,
     revision => $revision,
-    require  => Class['apache'],
   }
 }
