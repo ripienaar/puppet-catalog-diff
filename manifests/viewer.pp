@@ -11,8 +11,6 @@ class catalog_diff::viewer (
     default_ssl_vhost => false,
   }
 
-  apache::listen { $port: }
-
   apache::vhost {"${::ipaddress}:${port}":
     servername         => $fqdn,
     ip                 => $::ipaddress,
@@ -26,9 +24,10 @@ class catalog_diff::viewer (
         auth_require   => 'valid-user',
       },
     ],
-    priority           => '15',
-    require            => Htpasswd['puppet'],
-    port               => $port,
+    priority   => '15',
+    require    => Htpasswd['puppet'],
+    port       => $port,
+    add_listen => true,
   }
 
   htpasswd { 'puppet':
