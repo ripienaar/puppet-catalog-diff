@@ -31,8 +31,6 @@ class catalog_diff::viewer (
     add_listen => true,
   }
 
-  include apache::mod::auth_basic
-
   htpasswd { 'puppet':
     username    => 'puppet',
     cryptpasswd => ht_sha1($password),
