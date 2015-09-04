@@ -37,6 +37,15 @@ class catalog_diff::viewer (
     target      => '/var/www/.htpasswd',
   }
 
+  include apache::params
+
+  file { '/var/www/.htpasswd':
+    ensure => 'file',
+    owner  => $apache::params::user,
+    group  => $apache::params::group,
+    mode   => '700',
+  }
+
   vcsrepo { '/var/www/diff':
     ensure   => latest,
     provider => 'git',
