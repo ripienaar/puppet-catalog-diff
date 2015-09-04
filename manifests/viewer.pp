@@ -18,7 +18,7 @@ class catalog_diff::viewer (
     docroot            => '/var/www/diff',
     ip_based           => true,
     directories        => [
-      { path           => '/',
+      { path           => '/var/www/diff',
         auth_type      => 'basic',
         auth_name      => 'Catalog Diff',
         auth_user_file => '/var/www/.htpasswd',
