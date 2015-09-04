@@ -13,10 +13,11 @@ class catalog_diff::viewer (
   apache::listen { '1495': }
 
   apache::vhost { 'catalog-diff-website':
-    ip          => $::ipaddress,
-    docroot     => '/var/www/diff',
-    ip_based    => true,
-    directories => [
+    servername         => $fqdn,
+    ip                 => $::ipaddress,
+    docroot            => '/var/www/diff',
+    ip_based           => true,
+    directories        => [
       { path           => '/var/www/diff',
         auth_type      => 'basic',
         auth_name      => 'Catalog Diff',
