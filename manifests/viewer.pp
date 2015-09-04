@@ -6,8 +6,8 @@ class catalog_diff::viewer (
   require git
 
   class {'apache':
-    default_vhost_ensure     => false,
-    default_ssl_vhost_ensure => false,
+    default_vhost     => false,
+    default_ssl_vhost => false,
   }
 
   apache::listen { '1495': }
