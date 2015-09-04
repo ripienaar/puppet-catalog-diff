@@ -22,7 +22,7 @@ class catalog_diff::viewer (
         auth_type      => 'basic',
         auth_name      => 'Catalog Diff',
         auth_user_file => '/var/www/.htpasswd',
-        auth_require   => 'puppet',
+        auth_require   => 'valid-user',
       },
     ],
     priority   => '15',
