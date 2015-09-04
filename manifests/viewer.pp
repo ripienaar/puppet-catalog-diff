@@ -19,7 +19,7 @@ class catalog_diff::viewer (
     ip_based           => true,
     directories        => [
       { path           => '/var/www/diff',
-        auth_type      => 'basic',
+        auth_type      => 'Basic',
         auth_name      => 'Catalog Diff',
         auth_user_file => '/var/www/.htpasswd',
         auth_require   => 'valid-user',
