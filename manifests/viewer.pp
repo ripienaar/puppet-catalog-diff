@@ -12,7 +12,7 @@ class catalog_diff::viewer (
 
   apache::listen { '1495': }
 
-  apache::vhost { 'catalog-diff-website':
+  apache::vhost { $::ipaddress:
     servername         => $fqdn,
     ip                 => $::ipaddress,
     docroot            => '/var/www/diff',
@@ -25,7 +25,8 @@ class catalog_diff::viewer (
         auth_require   => 'valid-user',
       },
     ],
-    require     => Htpasswd['puppet'],
+    priority           => '15',
+    require            => Htpasswd['puppet'],
   }
 
   htpasswd { 'puppet':
