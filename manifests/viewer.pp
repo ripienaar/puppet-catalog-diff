@@ -33,7 +33,7 @@ class catalog_diff::viewer (
 
   htpasswd { 'puppet':
     username    => 'puppet',
-    cryptpasswd => ht_md5($password,fqdn_rand($port)),
+    cryptpasswd => ht_sha1($password),
     target      => '/var/www/.htpasswd',
   }
 
