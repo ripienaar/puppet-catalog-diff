@@ -1,8 +1,9 @@
 class catalog_diff::viewer (
-  $remote   = 'https://github.com/camptocamp/puppet-catalog-diff-viewer.git',
-  $password = 'puppet',
-  $revision = 'master',
-  $port     = 1495,
+  $remote    = 'https://github.com/camptocamp/puppet-catalog-diff-viewer.git',
+  $password  = 'puppet',
+  $revision  = 'master',
+  $port      = 1495,
+  $listen_ip = $ipaddress,
 ) {
   require git
 
@@ -11,9 +12,9 @@ class catalog_diff::viewer (
     default_ssl_vhost => false,
   }
 
-  apache::vhost {"${::ipaddress}:${port}":
+  apache::vhost {"${listen_ip}:${port}":
     servername         => $fqdn,
-    ip                 => $::ipaddress,
+    ip                 => $listen_ip,
     docroot            => '/var/www/diff',
     ip_based           => true,
     directories        => [
