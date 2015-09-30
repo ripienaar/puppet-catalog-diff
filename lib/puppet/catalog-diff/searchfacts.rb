@@ -14,19 +14,21 @@ module Puppet::CatalogDiff
      old_server = options[:old_server].split('/')[0]
      old_env = options[:old_server].split('/')[1]
      if options[:use_puppetdb]
+       Puppet.debug("Using puppetDB to find active nodes")
        active_nodes = find_nodes_puppetdb(old_env)
      else
+       Puppet.debug("Using Fact Reset Interface to find active nodes")
        active_nodes = find_nodes_rest(old_server)
+     end
+     if options[:filter_local]
+       Puppet.debug("Using YAML cache to find active nodes")
+       yaml_cache = find_nodes_local()
+       active_nodes = yaml_cache
      end
      if active_nodes.empty?
        raise "No active nodes were returned from your fact search"
      end
-     if options[:filter_local]
-       yaml_cache = find_nodes_local()
-       yaml_cache.select { |node| active_nodes.include?(node) }
-     else
-       active_nodes
-     end
+     active_nodes
     end
 
     def find_nodes_local
@@ -38,8 +40,8 @@ module Puppet::CatalogDiff
         Puppet::Node.indirection.terminus_class = :yaml
         nodes = Puppet::Node.indirection.search("*")
       end
-      unless filtered =  nodes.select {|n|
-          @facts.select { |f, v| n[f] == v }.size == @facts.size
+      unless filtered =  nodes.select {|node|
+          @facts.select { |fact, v| node.facts.values[fact] == v }.size == @facts.size
         }.map{ |n| n.name }
         raise "No matching nodes found using yaml terminus"
       end
@@ -49,7 +51,8 @@ module Puppet::CatalogDiff
 
     def find_nodes_rest(server)
         query = @facts.map { |k, v| "facts.#{k}=#{v}" }.join('&')
-        endpoint = "/v2/facts_search/search?#{query}"
+        # https://github.com/puppetlabs/puppet/blob/3.8.0/api/docs/http_api_index.md#error-responses
+        endpoint = "/v2.0/facts_search/search?#{query}"
 
         begin
           connection = Puppet::Network::HttpPool.http_instance(server,'8140')
@@ -57,7 +60,9 @@ module Puppet::CatalogDiff
         rescue Exception => e
           raise "Error retrieving facts from #{server}: #{e.message}"
         end
-
+        if JSON.load(facts_object).has_key?('issue_kind')
+          raise "Not authorized to retrieve facts, auth.conf edits missing?" if facts_object['issue_kind'] == 'FAILED_AUTHORIZATION'
+        end
         begin
           filtered = PSON.load(facts_object)
         rescue Exception => e
