@@ -41,15 +41,12 @@ module Puppet::CatalogDiff
         when '.pson'
           tmp = PSON.load(File.read(r))
           unless tmp.respond_to? :version
-            tmp = PSON.load({
-              'document_type' => 'Catalog',
-              'data' => PSON.load(File.read(r)),
-            }.to_pson)
+            tmp = Puppet::Resource::Catalog.from_data_hash tmp
           end
         when '.json'
-          tmp = PSON.load(File.read(r))
-	else
-	  raise "Provide catalog with the approprtiate file extension, valid extensions are pson, yaml and marshal"
+          tmp = Puppet::Resource::Catalog.from_data_hash JSON.load(File.read(r))
+        else
+          raise "Provide catalog with the appropriate file extension, valid extensions are pson, yaml and marshal"
         end
 
         m[:version] = tmp.version
