@@ -91,9 +91,10 @@ module Puppet::CatalogDiff
         resource.edges.each do |b|
           convert25(b, collector)
         end
-      elsif resource.is_a?(Puppet::Relationship) and resource.target.is_a?(Puppet::Resource) and resource.target.title and resource.target.file
+      elsif resource.is_a?(Puppet::Relationship) and resource.target.is_a?(Puppet::Resource) and resource.target.title
         target = resource.target
-        manifestfile = target.file.gsub("/etc/puppet/manifests/", "")
+        # Make this conditional otherwise it skips create_resources based resources
+        manifestfile = target.file.gsub("/etc/puppet/manifests/", "") if target.file
 
         resource = {:type => target.type,
           :title => target.title,
