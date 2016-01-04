@@ -104,7 +104,7 @@ module Puppet::CatalogDiff
       changes      = resource_diffs[:new_params].keys.size
 
       changes_percentage      = (titles[:from].size.zero? && 0 || 100*(resource_diffs[:new_params].keys.size.to_f / titles[:from].size.to_f))
-      additions_percentage    = 100*(additions.to_f / titles[:to].size.to_f)
+      additions_percentage    = (titles[:to].size.zero?   && 0 || 100*(additions.to_f / titles[:to].size.to_f))
       subtractions_percentage = (titles[:from].size.zero? && 0 || 100*(subtractions.to_f / titles[:from].size.to_f))
 
 
