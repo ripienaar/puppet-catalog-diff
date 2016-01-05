@@ -73,11 +73,12 @@ module Puppet::CatalogDiff
 
     def find_nodes_puppetdb(env)
         require 'puppet/util/puppetdb'
-        port = Puppet::Util::Puppetdb.port
+        server_url = Puppet::Util::Puppetdb.config.server_urls[0]
+        port = server_url.port
         use_ssl = port != 8080
-        connection = Puppet::Network::HttpPool.http_instance(Puppet::Util::Puppetdb.server,port,use_ssl)
+        connection = Puppet::Network::HttpPool.http_instance(server_url.host,port,use_ssl)
         base_query = ["and", ["=", ["node","active"], true]]
-        base_query.concat([["=", "catalog-environment", env]]) if env
+        base_query.concat([["=", "catalog_environment", env]]) if env
         real_facts = @facts.select { |k, v| !v.nil? }
         query = base_query.concat(real_facts.map { |k, v| ["=", ["fact", k], v] })
         classes = Hash[@facts.select { |k, v| v.nil? }].keys
@@ -97,7 +98,7 @@ module Puppet::CatalogDiff
           )
         end
         json_query = URI.escape(query.to_json)
-        unless filtered = PSON.load(connection.request_get("/v4/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
+        unless filtered = PSON.load(connection.request_get("/pdb/query/v4/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
         names = filtered.map { |node| node['certname'] }
