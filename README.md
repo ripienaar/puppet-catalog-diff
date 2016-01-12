@@ -1,5 +1,10 @@
 What?
 =====
+
+**NOTE:** You should now use https://forge.puppetlabs.com/zack/catalog_diff
+which is well maintained and recent :)
+
+
 A tool to compare two Puppet catalogs.
 
 While upgrading versions of Puppet or refactoring Puppet code you want to
