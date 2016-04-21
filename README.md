@@ -11,7 +11,7 @@ touching any of your nodes.
 This tool is delivered as a Puppet Face. It thus requires a Puppet installation
 to properly run.
 
-The diff tool recognizes catalogs in yaml, marshall, or pson format.Currently automatic
+The diff tool recognizes catalogs in yaml, marshall, or pson format. Currently automatic
 generation of the catalogs is done in the pson format.
 
 The tool can automatically compile the catalogs for both your new and older servers.
@@ -19,7 +19,7 @@ It can ask the master to use the yaml cache to compile the catalog for the last
 known environment with the last known facts. It can then validate against the rest
 terminus ( or by proxy puppetdb ) that the node is still active. This filtered list
 should contain only machines that have not been decommissioned in puppetdb (important
-as complaining their catalogs would also reactive them and their exports otherwise ).
+as compling their catalogs would also reactive them and their exports otherwise).
 
 # Usage
 Before starting you need to copy or mount the contents of your current master's
@@ -28,8 +28,8 @@ the yamldirs of all nodes to give the fullest picture of all catalogs
 
 
 You can retrieve the current yamldir location with the following command:
-`puppet master --configprint yamldir`. If you are using  puppet
-enterprise this directory is '/var/opt/lib/pe-puppet/yaml'. It is not required
+`puppet master --configprint yamldir`. If you are using  Puppet
+Enterprise this directory is '/var/opt/lib/pe-puppet/yaml'. It is not required
 to use a specific "diff" node , as you could use the "new" puppet server.
 
 Once the yamldir is in place you need to allow access to the "diff" node to
@@ -57,14 +57,14 @@ allow diff.example.com
 
 The /facts ACL is optional onlly if you are using puppetdb and running the query
 from the master. You can pass `--use_puppetdb` to query the puppetdb server
-directly rather then via the rest terminus. However the rest terminus should
+directly rather than via the rest terminus. However the rest terminus should
 be the same list of nodes if they are both backed by puppetdb and so this
 option is only for environments where puppetdb is more authoritative in some
 way they the facts rest query. This option is provided for future compatibility.
 
 You can run this face without root access if you run the script as the puppet user
 on the system. The following is an example script doing so. You can alternatively
-install this in your module path on Puppet 3 and higher with out the need of
+install this in your module path on Puppet 3 and higher without the need of
 exporting RUBYLIB. One example of when you would need to run this as non
 root would be if you mounted the yamldir via NFS and had root squash enabled.
 
@@ -74,7 +74,7 @@ if !-d "${HOME}/puppet-catalog-diff" ; then
   git clone https://github.com/acidprime/puppet-catalog-diff.git
 fi
 
-# These should be changed for puppet enterprise
+# These should be changed for Puppet Enterprise
 export RUBYLIB="${HOME}/puppet-catalog-diff/lib/"
 export YAMLDIR='/var/lib/puppet/yaml'
 export SSLDIR='/var/lib/puppet/ssl'
@@ -122,14 +122,14 @@ would not compile are listed. You can modify the number of nodes shown here usin
 ## Output Report
 You can save the last report as json to a specific location using "`--output_report`"
 This report will contain the structured data in the format of running this command
-with `--render-as json`. As example Rakefile is provided with a `docs` task for
-converting this report to (github flavored) markdown. The script above also will
+with `--render-as json`. An example Rakefile is provided with a `docs` task for
+converting this report to (GitHub flavored) markdown. The script above also will
 save the output with escaped color. If you want to view that text report run
 `less -r lastrun-$$.log`
 
 ## Output description
 During the transition of 0.24.x to 0.25.x there was a serialization bug that
-resulted in unexpected file content changes, I've recreated this bug in a tiny
+resulted in unexpected file content changes. I've recreated this bug in a tiny
 2 resource catalog, the output below shows how this tool would have highlighted
 this bug prior to upgrading any nodes.
 
