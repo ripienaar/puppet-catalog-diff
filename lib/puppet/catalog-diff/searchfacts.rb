@@ -98,7 +98,7 @@ module Puppet::CatalogDiff
           )
         end
         json_query = URI.escape(query.to_json)
-        unless filtered = PSON.load(connection.request_get("/pdb/query/v4/nodes/?query=#{json_query}", {"Accept" => 'application/json'}).body)
+        unless filtered = PSON.load(connection.request_get("/pdb/query/v4/nodes?query=#{json_query}", {"Accept" => 'application/json'}).body)
           raise "Error parsing json output of puppet search"
         end
         names = filtered.map { |node| node['certname'] }
