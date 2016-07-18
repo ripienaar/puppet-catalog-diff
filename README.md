@@ -19,7 +19,7 @@ It can ask the master to use the yaml cache to compile the catalog for the last
 known environment with the last known facts. It can then validate against the rest
 terminus ( or by proxy puppetdb ) that the node is still active. This filtered list
 should contain only machines that have not been decommissioned in puppetdb (important
-as compling their catalogs would also reactive them and their exports otherwise).
+as compiling their catalogs would also reactive them and their exports otherwise).
 
 # Usage
 Before starting you need to copy or mount the contents of your current master's
