@@ -23,7 +23,7 @@ as compiling their catalogs would also reactive them and their exports otherwise
 
 # Usage
 Before starting you need to copy or mount the contents of your current master's
-yamldir on the diff node,new master and old master.If you have multiple masters then combine
+yamldir on the diff node, new master and old master.If you have multiple masters then combine
 the yamldirs of all nodes to give the fullest picture of all catalogs
 
 
