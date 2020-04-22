@@ -7,11 +7,11 @@ module Puppet::CatalogDiff
       @node_name = node_name
       catalog = compile_catalog(node_name,server)
       begin
-        PSON.parse(catalog)
-        save_catalog_to_disk(save_directory,node_name,catalog,'pson')
-        if catalog.has_key?('issue_kind')
-          raise c.message
+        p = PSON.parse(catalog)
+        if p.has_key?('issue_kind')
+          raise p['message']
         end
+        save_catalog_to_disk(save_directory,node_name,catalog,'pson')
       rescue Exception => e
         Puppet.err("Server returned invalid catalog for #{node_name}")
         save_catalog_to_disk(save_directory,node_name,catalog,'error')
