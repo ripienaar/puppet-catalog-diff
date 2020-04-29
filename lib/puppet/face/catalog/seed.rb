@@ -12,6 +12,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       default_to { Facter.value('fqdn') }
     end
 
+    option "--certless" do
+      summary "Use the certless catalog API (Puppet >= 6.3.0)"
+    end
+
     description <<-'EOT'
       This action is used to seed a series of catalogs to then be compared with diff
     EOT
@@ -53,7 +57,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         Thread.new(nodes,compiled_nodes,options) do |nodes,compiled_nodes,options|
           while node_name = mutex.synchronize { nodes.pop }
             begin
-              compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory,options[:master_server])
+              compiled = Puppet::CatalogDiff::CompileCatalog.new(node_name,save_directory,options[:master_server],options[:certless])
               mutex.synchronize { compiled_nodes << node_name }
             rescue Exception => e
               Puppet.err("Unable to compile catalog for #{node_name}\n\t#{e}")

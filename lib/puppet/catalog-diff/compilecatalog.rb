@@ -3,9 +3,9 @@ module Puppet::CatalogDiff
   class CompileCatalog
     attr_reader :node_name
 
-    def initialize(node_name,save_directory,server)
+    def initialize(node_name,save_directory,server,certless)
       @node_name = node_name
-      catalog = compile_catalog(node_name,server)
+      catalog = compile_catalog(node_name,server,certless)
       begin
         p = PSON.parse(catalog)
         if p.has_key?('issue_kind')
@@ -36,16 +36,39 @@ module Puppet::CatalogDiff
       node.environment
     end
 
-    def compile_catalog(node_name,server)
+    def compile_catalog(node_name,server,certless)
       server,environment = server.split('/')
       environment ||= lookup_environment(node_name)
-      endpoint = "/puppet/v3/catalog/#{node_name}?environment=#{environment}"
       server,port = server.split(':')
       port ||= '8140'
+      headers = {
+        'Accept' => 'pson',
+      }
+
+      if certless
+        endpoint = '/puppet/v4/catalog'
+        headers['Content-Type'] = 'text/json'
+        body = {
+          certname: node_name,
+          environment: environment,
+          persistence: {
+            facts: false,
+            catalog: false,
+          },
+        }
+      else
+        endpoint = "/puppet/v3/catalog/#{node_name}?environment=#{environment}"
+      end
+
       Puppet.debug("Connecting to server: #{server}")
       begin
         connection = Puppet::Network::HttpPool.http_instance(server,port)
-        catalog = connection.request_get(endpoint, {"Accept" => 'pson'}).body
+
+        if certless
+          catalog = connection.request_post(endpoint, body.to_json, headers).body
+        else
+          catalog = connection.request_get(endpoint, headers).body
+        end
       rescue Exception => e
         raise "Failed to retrieve catalog for #{node_name} from #{server} in environment #{environment}: #{e.message}"
       end
