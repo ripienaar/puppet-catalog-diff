@@ -63,7 +63,7 @@ module Puppet::CatalogDiff
         endpoint = "/puppet/v3/catalog/#{node_name}?environment=#{environment}"
       end
 
-      Puppet.debug("Connecting to server: #{server}")
+      Puppet.debug("Connecting to server: #{server}#{endpoint}")
       begin
         connection = Puppet::Network::HttpPool.http_instance(server,port)
 
