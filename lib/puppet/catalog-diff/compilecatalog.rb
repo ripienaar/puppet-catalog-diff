@@ -11,6 +11,9 @@ module Puppet::CatalogDiff
         if p.has_key?('issue_kind')
           raise p['message']
         end
+        if certless
+          catalog = render_pson(p['catalog'])
+        end
         save_catalog_to_disk(save_directory,node_name,catalog,'pson')
       rescue Exception => e
         Puppet.err("Server returned invalid catalog for #{node_name}")
