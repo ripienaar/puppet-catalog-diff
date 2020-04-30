@@ -28,6 +28,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary "Use puppetdb to do the fact search instead of the rest api"
     end
 
+    option "--[no-]filter_old_env" do
+      summary "Whether to filter nodes on the old server's environment in PuppetDB"
+    end
+
     option "--filter_local" do
       summary "Use local YAML node files to filter out queried nodes"
     end

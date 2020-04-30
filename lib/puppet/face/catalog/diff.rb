@@ -45,6 +45,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary "Use puppetdb to do the fact search instead of the rest api"
     end
 
+    option "--[no-]filter_old_env" do
+      summary "Whether to filter nodes on the old server's environment in PuppetDB"
+    end
+
     option "--changed_depth=" do
       summary "The number of nodes to display sorted by changes"
       default_to { "10" }
@@ -147,7 +151,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
         # User passed use two hostnames
         old_catalogs = Dir.mktmpdir("#{catalog1.gsub('/', '_')}-")
         new_catalogs = Dir.mktmpdir("#{catalog2.gsub('/', '_')}-")
-        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth], :threads => options[:threads], :use_puppetdb => options[:use_puppetdb], :filter_local => options[:filter_local], :certless => options[:certless])
+        pull_output = Puppet::Face[:catalog, '0.0.1'].pull(old_catalogs,new_catalogs,options[:fact_search],:old_server => catalog1,:new_server => catalog2,:changed_depth => options[:changed_depth], :threads => options[:threads], :use_puppetdb => options[:use_puppetdb], :filter_old_env => options[:filter_old_env], :filter_local => options[:filter_local], :certless => options[:certless])
         diff_output = Puppet::Face[:catalog, '0.0.1'].diff(old_catalogs,new_catalogs,options)
         nodes = diff_output
         FileUtils.rm_rf(old_catalogs)
