@@ -53,9 +53,11 @@ module Puppet::CatalogDiff
         query = @facts.map { |k, v| "facts.#{k}=#{v}" }.join('&')
         # https://github.com/puppetlabs/puppet/blob/3.8.0/api/docs/http_api_index.md#error-responses
         endpoint = "/v2.0/facts_search/search?#{query}"
+        server,port = server.split(':')
+        port ||= '8140'
 
         begin
-          connection = Puppet::Network::HttpPool.http_instance(server,'8140')
+          connection = Puppet::Network::HttpPool.http_instance(server,port)
           facts_object = connection.request_get(endpoint, {"Accept" => 'pson'}).body
         rescue Exception => e
           raise "Error retrieving facts from #{server}: #{e.message}"
