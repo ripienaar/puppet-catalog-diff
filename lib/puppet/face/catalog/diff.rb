@@ -30,7 +30,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
     end
 
     option '--show_resource_diff' do
-      summary 'Display differeces between resources in unified diff format'
+      summary 'Display differences between resources in unified diff format'
     end
 
     option '--exclude_classes' do
@@ -214,7 +214,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           format.key_pair(header,value)
         end
         end.delete_if {|x| x.nil? or x == []  }.join("\n")
-      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed",nodes[:most_changed])}\n\n#{format.list_hash("Nodes with the most changes by differeces",nodes[:most_differences],'')}#{(nodes.has_key?(:pull_output) && format.render_pull(nodes[:pull_output]))}"
+      end.join("\n") + "#{format.node_summary_header("#{nodes[:with_changes]} out of #{nodes[:total_nodes]} nodes changed.",nodes,:total_percentage)}\n#{format.list_hash("Nodes with the most changes by percent changed",nodes[:most_changed])}\n\n#{format.list_hash("Nodes with the most changes by differences",nodes[:most_differences],'')}#{(nodes.has_key?(:pull_output) && format.render_pull(nodes[:pull_output]))}"
     end
   end
 end
