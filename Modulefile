@@ -1,8 +1,0 @@
-name 'zack-catalog_diff'
-version '1.6.0'
-source 'git@github.com:acidprime/puppet-catalog-diff.git'
-author 'R.I.Pienaar and Zack Smith'
-license 'Apache'
-summary 'Compares two catalogs and shows the differences'
-description 'Compares two catalogs and shows the differences'
-project_page 'https://github.com/acidprime/puppet-catalog-diff'

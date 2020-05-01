@@ -13,11 +13,11 @@ class catalog_diff::viewer (
   }
 
   apache::vhost {"${listen_ip}:${port}":
-    servername          => $fqdn,
-    ip                  => $listen_ip,
-    docroot             => '/var/www/diff',
-    ip_based            => true,
-    directories         => [
+    servername  => $fqdn,
+    ip          => $listen_ip,
+    docroot     => '/var/www/diff',
+    ip_based    => true,
+    directories => [
       { path            => '/var/www/diff',
         auth_type       => 'Basic',
         auth_name       => 'Catalog Diff',
@@ -27,10 +27,10 @@ class catalog_diff::viewer (
         allow_override  => 'AuthConfig',
       },
     ],
-    priority   => '15',
-    require    => Htpasswd['puppet'],
-    port       => $port,
-    add_listen => true,
+    priority    => '15',
+    require     => Htpasswd['puppet'],
+    port        => $port,
+    add_listen  => true,
   }
 
   htpasswd { 'puppet':
@@ -45,7 +45,7 @@ class catalog_diff::viewer (
     ensure => 'file',
     owner  => $apache::params::user,
     group  => $apache::params::group,
-    mode   => '700',
+    mode   => '0700',
     before => Htpasswd['puppet'],
   }
 

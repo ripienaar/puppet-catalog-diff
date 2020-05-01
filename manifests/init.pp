@@ -24,6 +24,6 @@ class catalog_diff(
     owner   => 'pe-puppet',
     group   => 'pe-puppet',
     recurse => true,
-    source  => 'puppet:///yaml'
+    source  => 'puppet:///modules/yaml'
   }
 }

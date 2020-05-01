@@ -1,0 +1,15 @@
+".gitlab-ci.yml":
+  delete: true
+".rubocop.yml":
+  default_configs:
+    require:
+    - rubocop-rspec
+Gemfile:
+  use_litmus: true
+  optional:
+    ":development":
+    - gem: github_changelog_generator
+      condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')
+spec/spec_helper.rb:
+  mock_with: ":rspec"
+  coverage_report: true
