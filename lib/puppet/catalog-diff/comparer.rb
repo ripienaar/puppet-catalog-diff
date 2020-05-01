@@ -1,4 +1,5 @@
 require 'puppet/util/diff'
+require 'digest'
 module Puppet::CatalogDiff
   module Comparer
     # Creates an array of just the resource titles
@@ -109,7 +110,7 @@ module Puppet::CatalogDiff
       differences
     end
 
-    def str_diff(str1, str2)
+    def do_str_diff(str1, str2)
       paths = [str1,str2].collect do |s|
         tempfile = Tempfile.new("puppet-diffing")
         tempfile.open
@@ -120,6 +121,13 @@ module Puppet::CatalogDiff
       diff = Puppet::Util::Diff.diff(paths[0].path, paths[1].path)
       paths.each { |f| f.delete }
       diff
+    end
+
+    def str_diff(str1, str2)
+      @@cached_str_diffs ||= {}
+      sum1 = Digest::MD5.hexdigest str1
+      sum2 = Digest::MD5.hexdigest str2
+      @@cached_str_diffs["#{sum1}/#{sum2}"] ||= do_str_diff(str1, str2)
     end
   end
 end
