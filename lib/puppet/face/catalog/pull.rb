@@ -32,6 +32,14 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary "Whether to filter nodes on the old server's environment in PuppetDB"
     end
 
+    option "--old_catalog_from_puppetdb" do
+      summary "Get old catalog from PuppetDB inside of compile master"
+    end
+
+    option "--new_catalog_from_puppetdb" do
+      summary "Get new catalog from PuppetDB inside of compile master"
+    end
+
     option "--filter_local" do
       summary "Use local YAML node files to filter out queried nodes"
     end
@@ -79,11 +87,11 @@ Puppet::Face.define(:catalog, '0.0.1') do
          while node_name = mutex.synchronize { nodes.pop }
             begin
               if nodes.size.odd?
-                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server],:certless => options[:certless] )
-                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server],:certless => options[:certless] )
+                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server],:certless => options[:certless],:catalog_from_puppetdb => options[:old_catalog_from_puppetdb])
+                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server],:certless => options[:certless],:catalog_from_puppetdb => options[:new_catalog_from_puppetdb])
               else
-                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server],:certless => options[:certless] )
-                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server],:certless => options[:certless] )
+                new_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog2,node_name,:master_server => options[:new_server],:certless => options[:certless],:catalog_from_puppetdb => options[:new_catalog_from_puppetdb])
+                old_server = Puppet::Face[:catalog, '0.0.1'].seed(catalog1,node_name,:master_server => options[:old_server],:certless => options[:certless],:catalog_from_puppetdb => options[:old_catalog_from_puppetdb])
               end
               mutex.synchronize { compiled_nodes + old_server[:compiled_nodes] }
               mutex.synchronize { compiled_nodes + new_server[:compiled_nodes] }

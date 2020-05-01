@@ -3,17 +3,15 @@ module Puppet::CatalogDiff
   class CompileCatalog
     attr_reader :node_name
 
-    def initialize(node_name,save_directory,server,certless)
+    def initialize(node_name,save_directory,server,certless,catalog_from_puppetdb)
       @node_name = node_name
-      catalog = compile_catalog(node_name,server,certless)
+      if catalog_from_puppetdb
+        catalog = get_catalog_from_puppetdb(node_name,server)
+      else
+        catalog = compile_catalog(node_name,server,certless)
+      end
+      catalog = render_pson(catalog)
       begin
-        p = PSON.parse(catalog)
-        if p.has_key?('issue_kind')
-          raise p['message']
-        end
-        if certless
-          catalog = render_pson(p['catalog'])
-        end
         save_catalog_to_disk(save_directory,node_name,catalog,'pson')
       rescue Exception => e
         Puppet.err("Server returned invalid catalog for #{node_name}")
@@ -39,7 +37,41 @@ module Puppet::CatalogDiff
       node.environment
     end
 
+    def get_catalog_from_puppetdb(node_name,server)
+      Puppet.debug("Getting PuppetDB catalog for #{node_name}")
+      require 'puppet/util/puppetdb'
+      server_url = Puppet::Util::Puppetdb.config.server_urls[0]
+      port = server_url.port
+      use_ssl = port != 8080
+      connection = Puppet::Network::HttpPool.http_instance(server_url.host,port,use_ssl)
+      query = ["and", ["=", "certname","#{node_name}"]]
+      server,environment = server.split('/')
+      environment ||= lookup_environment(node_name)
+      query.concat([["=", "environment", environment]])
+      json_query = URI.escape(query.to_json)
+      ret = connection.request_get("/pdb/query/v4/catalogs?query=#{json_query}", {"Accept" => 'application/json'}).body
+      begin
+        catalog = PSON.parse(ret)
+      rescue PSON::ParserError => e
+        raise "Error parsing json output of puppetdb catalog query for #{node_name}: #{e.message}\ncontent: #{ret}"
+      end
+      catalog = catalog[0]
+      # Fix "data" level in PuppetDB catalog
+      catalog['resources'] = catalog['resources']['data']
+      # Fix edges
+      new_edges = []
+      catalog['edges']['data'].each do |e|
+        new_edges << {
+          'source' => "#{e['source_type']}[#{e['source_title']}]",
+          'target' => "#{e['target_type']}[#{e['target_title']}]",
+        }
+      end
+      catalog['edges'] = new_edges
+      catalog
+    end
+
     def compile_catalog(node_name,server,certless)
+      Puppet.debug("Compiling catalog for #{node_name}")
       server,environment = server.split('/')
       environment ||= lookup_environment(node_name)
       server,port = server.split(':')
@@ -68,12 +100,24 @@ module Puppet::CatalogDiff
         connection = Puppet::Network::HttpPool.http_instance(server,port)
 
         if certless
-          catalog = connection.request_post(endpoint, body.to_json, headers).body
+          ret = connection.request_post(endpoint, body.to_json, headers).body
         else
-          catalog = connection.request_get(endpoint, headers).body
+          ret = connection.request_get(endpoint, headers).body
         end
       rescue Exception => e
         raise "Failed to retrieve catalog for #{node_name} from #{server} in environment #{environment}: #{e.message}"
+      end
+
+      begin
+        catalog = PSON.parse(ret)
+      rescue PSON::ParserError => e
+        raise "Error parsing json output of puppet catalog query for #{node_name}: #{e.message}. Content: #{ret}"
+      end
+      if catalog.has_key?('issue_kind')
+        raise catalog['message']
+      end
+      if certless
+        catalog = catalog['catalog']
       end
       catalog
     end
