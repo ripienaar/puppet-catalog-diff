@@ -60,6 +60,7 @@ module Puppet::CatalogDiff
         end
 
         m[:version] = tmp.version
+        m[:environment] = tmp.environment
 
         if @version == "0.24"
           convert24(tmp, v)
@@ -83,6 +84,10 @@ module Puppet::CatalogDiff
       output = {}
       output[:old_version] = from_meta[:version]
       output[:new_version] = to_meta[:version]
+
+      output[:old_environment] = from_meta[:environment]
+      output[:new_environment] = to_meta[:environment]
+
       output[:total_resources_in_old] = titles[:from].size
       output[:total_resources_in_new] = titles[:to].size
 
