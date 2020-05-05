@@ -1,4 +1,7 @@
+# Puppet::CatalogDiff
 module Puppet::CatalogDiff
+  # FindCatalogs allows to find
+  # pairs of catalogs in two directories
   class FindCatalogs
     attr_accessor :old_catalog_path, :new_catalog_path
 

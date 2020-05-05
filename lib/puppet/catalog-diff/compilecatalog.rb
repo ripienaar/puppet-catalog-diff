@@ -1,6 +1,12 @@
 require 'puppet/network/http_pool'
+# Puppet::CatalogDiff
 module Puppet::CatalogDiff
+  # Puppet::CatalogDiff::CompileCatalog
+  # allows to retrieve a catalog, using
+  # v3/catalog, v4/catalog or PuppetDB
   class CompileCatalog
+    include Puppet::CatalogDiff::Preprocessor
+
     attr_reader :node_name
 
     def initialize(node_name, save_directory, server, certless, catalog_from_puppetdb)
@@ -52,19 +58,8 @@ module Puppet::CatalogDiff
       rescue PSON::ParserError => e
         raise "Error parsing json output of puppetdb catalog query for #{node_name}: #{e.message}\ncontent: #{ret}"
       end
-      catalog = catalog[0]
-      # Fix "data" level in PuppetDB catalog
-      catalog['resources'] = catalog['resources']['data']
-      # Fix edges
-      new_edges = []
-      catalog['edges']['data'].each do |edge|
-        new_edges << {
-          'source' => "#{edge['source_type']}[#{edge['source_title']}]",
-          'target' => "#{edge['target_type']}[#{edge['target_title']}]",
-        }
-      end
-      catalog['edges'] = new_edges
-      catalog
+
+      convert_pdb(catalog)
     end
 
     def compile_catalog(node_name, server, certless)

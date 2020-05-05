@@ -1,5 +1,5 @@
 class catalog_diff(
-  $diff_master,
+  String $diff_master,
 ) {
   puppet_auth { 'allow the diff server to retrieve any catalog':
     ensure        => present,

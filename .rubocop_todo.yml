@@ -1,0 +1,21 @@
+---
+Lint/AssignmentInCondition:
+  Enabled: false
+Lint/RescueException:
+  Enabled: false
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+Metrics/LineLength:
+  Enabled: false
+Performance/FixedSize:
+  Enabled: false
+Security/MarshalLoad:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Style/MultilineBlockChain:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false

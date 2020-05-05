@@ -1,5 +1,8 @@
 require 'puppet/util/terminal'
+# Puppet::CatalogDiff
 module Puppet::CatalogDiff
+  # Formater provides methods to format
+  # resources into diff-able Puppet DSL
   class Formater
     def initialize; end
 

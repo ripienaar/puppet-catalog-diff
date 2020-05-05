@@ -9,7 +9,10 @@ require 'tempfile'
 require File.expand_path(File.join(File.dirname(__FILE__), 'preprocessor.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'comparer.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'formater.rb'))
+
+# Puppet::CatalogDiff
 module Puppet::CatalogDiff
+  # Differ allows to diff two catalogs
   class Differ
     include Puppet::CatalogDiff::Preprocessor
     include Puppet::CatalogDiff::Comparer

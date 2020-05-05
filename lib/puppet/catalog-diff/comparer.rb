@@ -1,6 +1,9 @@
 require 'puppet/util/diff'
 require 'digest'
+# Puppet::CatalogDiff
 module Puppet::CatalogDiff
+  # Comparer providers methods
+  # to compare resources
   module Comparer
     # Creates an array of just the resource titles
     # it would be records like file["/foo"]

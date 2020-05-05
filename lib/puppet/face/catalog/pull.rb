@@ -122,7 +122,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
             rescue Exception => e
               Puppet.err(e.to_s)
             end
-           end
+          end
         end
       }.each(&:join)
       output = {}
