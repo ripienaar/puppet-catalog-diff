@@ -1,3 +1,7 @@
+---
+".travis.yml":
+  user: camptocamp
+  secure: "oVFK/jAf7ZbNR8cdo2AcqwnKp1pktpa+EkImXGF2b6L7OxOl2VXxbBKGW1IueUccmDH381XqrMtdbCVgz83u3HdpkHb3PIFmchPgPeIBgevdubyfulHdwYN++nLL9zxRH+FXhW1qmqpvHFS8CHw4Ia2k69gdcQNNlC60WYk1QwxLYTnTaem2nWZsmNZBNgh5TFzTJzsbJQFoyJlUUkbkg7rZig3qSw/otqwh/HUrEA+UUcBv6B6cIeMaKzaGvHWvfdXv8asT+r/kl/048J2FZM1ulQxZE+273Z1xwp4KATx00NqpceFcvHAInbMkgYuwi3nDJo4pKpqKWKvlw1CJm9+uXk9qYgFhaQpmkz5Jc3njiPZadRITkYG4T9dUHlvN47LDJOZNCwr8kjEkakI1Rv/H7tFlxHG/42TJDAs9dqB4aoiflzo4GOBAsx+YtpTmM+1aWvdDjeedxnuVrGn1lgHkibm7kSiNZDdxQ4/Xv/yYmuko8kam/HdlXC7bg0myQE4zdHPAxcn6qnC6zifmssgonaGXlx+3Hmnqqb7F3vv5+w4Nb9VYekVc6JY0slyq5ADvbNkSL2dGx0qlX4dD2puRgZM/NFAGsJ0AANIIDGWBDb3nj8ofvpRs7ab48U2eRiLb+3vhnIK83S4CdNnZH7TidCv9Y6bAcuQkD0qlXUQ="
 ".gitlab-ci.yml":
   delete: true
 ".rubocop.yml":
