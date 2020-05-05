@@ -40,14 +40,6 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'A comma-separated list of resource parameters to ignore in diff'
     end
 
-    option '--filter_local' do
-      summary 'Use local YAML node files to filter out queried nodes'
-    end
-
-    option '--use_puppetdb' do
-      summary 'Use puppetdb to do the fact search instead of the rest api'
-    end
-
     option '--[no-]filter_old_env' do
       summary "Whether to filter nodes on the old server's environment in PuppetDB"
       default_to { true }
@@ -168,9 +160,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
           old_server: catalog1, new_server: catalog2,
           changed_depth: options[:changed_depth],
           threads: options[:threads],
-          use_puppetdb: options[:use_puppetdb],
           filter_old_env: options[:filter_old_env],
-          filter_local: options[:filter_local],
           certless: options[:certless],
           old_catalog_from_puppetdb: options[:old_catalog_from_puppetdb],
           new_catalog_from_puppetdb: options[:new_catalog_from_puppetdb]

@@ -25,9 +25,9 @@ Currently automatic generation of the catalogs is done in the pson format.
 
 The tool can automatically compile the catalogs for both your new and older
 servers/environments.
-It can ask the master to use the yaml or PuppetDB cache to compile the catalog for the last
-known environment with the last known facts. It can then validate against the rest
-terminus (or using PuppetDB) that the node is still active. This filtered list
+It can ask the master to use PuppetDB to compile the catalog for the last
+known environment with the last known facts. It can then validate against PuppetDB
+that the node is still active. This filtered list
 should contain only machines that have not been decommissioned in PuppetDB (important
 as compiling their catalogs would also reactive them and their exports otherwise).
 
@@ -37,28 +37,8 @@ as compiling their catalogs would also reactive them and their exports otherwise
 
 ### Set up node discovery
 
-Before starting you need one of two options:
 
-* copy or mount the contents of your current master's yamldir on the diff node
-* or an access to PuppetDB to retrieve the nodes and their facts.
-
-
-#### Set up with YAML files
-
-
-Start by copying or mounting the contents of your current master's
-yamldir on the diff node, new master and old master.
-
-If you have multiple masters then combine
-the yamldirs of all nodes to give the fullest picture of all catalogs.
-
-On the Puppetserver, the yamldir is at `/opt/puppetlabs/server/data/puppetserver/yaml`
-It is not required to use a specific "diff" node , as you could use the "new" puppet server.
-
-
-#### Set up with PuppetDB
-
-If you use the PuppetDB option (with `--use_puppetdb`), you'll need to either:
+Node discovery requires an access to the PuppetDB. You'll need either:
 
 * have an unencrypted access to PuppetDB (port 8080, local or proxified)
 * generate a set key and certificate signed by the Puppet CA to access the
@@ -157,11 +137,9 @@ system, allowing use of all CPUs.
 ### Fact search
 
 You can pass `--fact_search` to filter the list of nodes based on a single fact value.
-This currently defaults to `kernel=Linux` if you do not pass it. The yaml cache will be
-queried to find all nodes whose fact matches that value. Once a list of nodes with known
-facts is compiled a rest or puppetdb connection ( as mentioned above) filters the list
-to only nodes who are "active" based typically on puppetdb. For more information on
-deactiving nodes in puppetdb see [this article](http://docs.puppetlabs.com/puppetdb/latest/maintain_and_tune.html)
+This currently defaults to `kernel=Linux` if you do not pass it.
+This query will be passed as a filter to the PuppetDB to retrieve the list of
+nodes to compare.
 
 ### Changed depth
 

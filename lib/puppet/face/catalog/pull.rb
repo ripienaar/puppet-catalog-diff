@@ -24,10 +24,6 @@ Puppet::Face.define(:catalog, '0.0.1') do
       default_to { '10' }
     end
 
-    option '--use_puppetdb' do
-      summary 'Use puppetdb to do the fact search instead of the rest api'
-    end
-
     option '--[no-]filter_old_env' do
       summary "Whether to filter nodes on the old server's environment in PuppetDB"
     end
@@ -38,10 +34,6 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     option '--new_catalog_from_puppetdb' do
       summary 'Get new catalog from PuppetDB inside of compile master'
-    end
-
-    option '--filter_local' do
-      summary 'Use local YAML node files to filter out queried nodes'
     end
 
     option '--changed_depth=' do

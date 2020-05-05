@@ -10,68 +10,15 @@ module Puppet::CatalogDiff
     end
 
     def find_nodes(options = {})
-      # Pull all nodes from the yaml cache
-      # Then validate they are active nodes against the rest of puppetdb api
-      old_server = options[:old_server].split('/')[0]
+      # Pull all nodes from PuppetDB
       old_env = options[:old_server].split('/')[1]
-      if options[:use_puppetdb]
-        Puppet.debug('Using puppetDB to find active nodes')
-        filter_env = (options[:filter_old_env]) ? old_env : nil
-        active_nodes = find_nodes_puppetdb(filter_env)
-      else
-        Puppet.debug('Using Fact Reset Interface to find active nodes')
-        active_nodes = find_nodes_rest(old_server)
-      end
-      if options[:filter_local]
-        Puppet.debug('Using YAML cache to find active nodes')
-        yaml_cache = find_nodes_local
-        active_nodes = yaml_cache
-      end
+      Puppet.debug('Using PuppetDB to find active nodes')
+      filter_env = (options[:filter_old_env]) ? old_env : nil
+      active_nodes = find_nodes_puppetdb(filter_env)
       if active_nodes.empty?
         raise 'No active nodes were returned from your fact search'
       end
       active_nodes
-    end
-
-    def find_nodes_local
-      Puppet[:clientyamldir] = Puppet[:yamldir]
-      if Puppet::Node.respond_to? :terminus_class
-        Puppet::Node.terminus_class = :yaml
-        nodes = Puppet::Node.search('*')
-      else
-        Puppet::Node.indirection.terminus_class = :yaml
-        nodes = Puppet::Node.indirection.search('*')
-      end
-      unless filtered = nodes.select { |node|
-                          @facts.select { |fact, v| node.facts.values[fact] == v }.size == @facts.size
-                        }.map { |n| n.name }
-        raise 'No matching nodes found using yaml terminus'
-      end
-      filtered
-    end
-
-    def find_nodes_rest(server)
-      query = @facts.map { |k, v| "facts.#{k}=#{v}" }.join('&')
-      # https://github.com/puppetlabs/puppet/blob/3.8.0/api/docs/http_api_index.md#error-responses
-      endpoint = "/v2.0/facts_search/search?#{query}"
-      server, port = server.split(':')
-      port ||= '8140'
-
-      begin
-        connection = Puppet::Network::HttpPool.http_instance(server, port)
-        facts_object = connection.request_get(endpoint, 'Accept' => 'pson').body
-      rescue Exception => e
-        raise "Error retrieving facts from #{server}: #{e.message}"
-      end
-      if JSON.parse(facts_object).key?('issue_kind')
-        raise 'Not authorized to retrieve facts, auth.conf edits missing?' if facts_object['issue_kind'] == 'FAILED_AUTHORIZATION'
-      end
-      begin
-        filtered = PSON.parse(facts_object)
-      rescue PSON::ParserError => e
-        raise "Received invalid data from facts endpoint: #{e.message}"
-      end
-      filtered
     end
 
     def find_nodes_puppetdb(env)
