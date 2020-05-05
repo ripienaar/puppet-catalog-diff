@@ -50,6 +50,7 @@ Puppet::Face.define(:catalog, '0.0.1') do
 
     option '--[no-]filter_old_env' do
       summary "Whether to filter nodes on the old server's environment in PuppetDB"
+      default_to { true }
     end
 
     option '--old_catalog_from_puppetdb' do
