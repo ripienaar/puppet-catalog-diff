@@ -3,6 +3,7 @@
 [![Puppet Forge Version](http://img.shields.io/puppetforge/v/camptocamp/catalog_diff.svg)](https://forge.puppetlabs.com/camptocamp/catalog_diff)
 [![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/camptocamp/catalog_diff.svg)](https://forge.puppetlabs.com/camptocamp/catalog_diff)
 [![Build Status](https://img.shields.io/travis/camptocamp/puppet-catalog-diff/master.svg)](https://travis-ci.org/camptocamp/puppet-catalog-diff)
+[![Coverage Status](https://img.shields.io/coveralls/camptocamp/puppet-catalog-diff.svg)](https://coveralls.io/r/camptocamp/puppet-catalog-diff)
 [![By Camptocamp](https://img.shields.io/badge/by-camptocamp-fb7047.svg)](http://www.camptocamp.com)
 
 ## Overview
