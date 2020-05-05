@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.0.0](https://github.com/camptocamp/puppet-catalog-diff/tree/v2.0.0) (2020-05-05)
+
+[Full Changelog](https://github.com/camptocamp/puppet-catalog-diff/compare/v1.7.0...v2.0.0)
+
+### Changed
+
+- Decommission old fact\_search methods [\#17](https://github.com/camptocamp/puppet-catalog-diff/pull/17) ([raphink](https://github.com/raphink))
+
+### Added
+
+- Add coveralls [\#20](https://github.com/camptocamp/puppet-catalog-diff/pull/20) ([raphink](https://github.com/raphink))
+- Test comparer [\#18](https://github.com/camptocamp/puppet-catalog-diff/pull/18) ([raphink](https://github.com/raphink))
+- Update Readme [\#16](https://github.com/camptocamp/puppet-catalog-diff/pull/16) ([raphink](https://github.com/raphink))
+- Refactor/lint [\#15](https://github.com/camptocamp/puppet-catalog-diff/pull/15) ([raphink](https://github.com/raphink))
+
+### Fixed
+
+- Fix convert\_pdb [\#21](https://github.com/camptocamp/puppet-catalog-diff/pull/21) ([raphink](https://github.com/raphink))
+
 ## [v1.7.0](https://github.com/camptocamp/puppet-catalog-diff/tree/v1.7.0) (2020-05-05)
 
 [Full Changelog](https://github.com/camptocamp/puppet-catalog-diff/compare/v1.6.0...v1.7.0)
