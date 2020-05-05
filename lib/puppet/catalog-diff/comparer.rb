@@ -1,5 +1,7 @@
 require 'puppet/util/diff'
 require 'digest'
+require File.expand_path(File.join(File.dirname(__FILE__), 'formater.rb'))
+
 # Puppet::CatalogDiff
 module Puppet::CatalogDiff
   # Comparer providers methods
@@ -97,20 +99,11 @@ module Puppet::CatalogDiff
     end
 
     # Takes arrays of resource titles and shows the differences
-    def return_resource_diffs(r1, r2)
-      only_in_old = []
-      (r2 - r1).each do |r|
-        only_in_old << r.to_s
-      end
-      only_in_new = []
-      (r1 - r2).each do |r|
-        only_in_new << r.to_s
-      end
-      differences = {
-        titles_only_in_old: only_in_old,
-        titles_only_in_new: only_in_new,
+    def return_resource_diffs(old, new)
+      {
+        titles_only_in_old: (old - new).map { |r| r.to_s },
+        titles_only_in_new: (new - old).map { |r| r.to_s },
       }
-      differences
     end
 
     def do_str_diff(str1, str2)

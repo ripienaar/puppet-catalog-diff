@@ -80,7 +80,7 @@ module Puppet::CatalogDiff
       output[:total_resources_in_old] = titles[:from].size
       output[:total_resources_in_new] = titles[:to].size
 
-      resource_diffs_titles = return_resource_diffs(titles[:to], titles[:from])
+      resource_diffs_titles = return_resource_diffs(titles[:from], titles[:to])
       output[:only_in_old] = resource_diffs_titles[:titles_only_in_old]
       output[:only_in_new] = resource_diffs_titles[:titles_only_in_new]
 
