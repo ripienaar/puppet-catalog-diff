@@ -1,4 +1,6 @@
 require 'puppet/network/http_pool'
+require File.expand_path(File.join(File.dirname(__FILE__), 'preprocessor.rb'))
+
 # Puppet::CatalogDiff
 module Puppet::CatalogDiff
   # Puppet::CatalogDiff::CompileCatalog
