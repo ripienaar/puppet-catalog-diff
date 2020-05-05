@@ -19,6 +19,7 @@ Gemfile:
     ":development":
     - gem: github_changelog_generator
       condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')
+    - gem: coveralls
 
 spec/spec_helper.rb:
   mock_with: ":rspec"

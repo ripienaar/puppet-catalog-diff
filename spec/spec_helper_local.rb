@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 include RspecPuppetFacts
 
 # HACK: to enable all the expect syntax (like allow_any_instance_of) in rspec-puppet examples
