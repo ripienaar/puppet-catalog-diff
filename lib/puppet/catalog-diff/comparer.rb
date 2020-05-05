@@ -26,16 +26,8 @@ module Puppet::CatalogDiff
       parameters_in_old = {}
       parameters_in_new = {}
       old.each do |resource|
-        new_resource = new.find{|res| res[:resource_id] == resource[:resource_id]}
+        new_resource = new.find { |res| res[:resource_id] == resource[:resource_id] }
         next if new_resource.nil?
-
-        # 0.24.x would set eg. on exec the command property to the same as name
-        # even when they were the same, 25 onward doesnt so get rid of these.
-        #
-        # there are no doubt many more
-        #resource[:parameters].delete(:name) unless new_resource[:parameters].include?(:name)
-        #resource[:parameters].delete(:command) unless new_resource[:parameters].include?(:command)
-        #resource[:parameters].delete(:path) unless new_resource[:parameters].include?(:path)
 
         if options[:ignore_parameters]
           blacklist = options[:ignore_parameters].split(',')
@@ -46,38 +38,36 @@ module Puppet::CatalogDiff
         sort_dependencies!(new_resource[:parameters])
         sort_dependencies!(resource[:parameters])
 
-        unless new_resource[:parameters] == resource[:parameters]
-          parameters_in_old[resource[:resource_id]] = \
-          Hash[(resource[:parameters].to_a - new_resource[:parameters].to_a )]
+        next if new_resource[:parameters] == resource[:parameters]
 
-          parameters_in_new[resource[:resource_id]] = \
-          Hash[(new_resource[:parameters].to_a - resource[:parameters].to_a )]
+        parameters_in_old[resource[:resource_id]] = \
+          Hash[(resource[:parameters].to_a - new_resource[:parameters].to_a)]
 
-          if options[:show_resource_diff]
-            Puppet.debug("Resource diff: #{resource[:resource_id]}")
+        parameters_in_new[resource[:resource_id]] = \
+          Hash[(new_resource[:parameters].to_a - resource[:parameters].to_a)]
 
-            diff_array = str_diff(
-                           Puppet::CatalogDiff::Formater.new().resource_to_string(resource),
-                           Puppet::CatalogDiff::Formater.new().resource_to_string(new_resource)
-                         ).split("\n")
-            if diff_array.size >= 3
-              string_differences[resource[:resource_id]] = diff_array[3..-1]
-            else
-              Puppet.debug('Could not automatically detect diff')
-              string_differences[resource[:resource_id]] = resource[:parameters].inspect + new_resource[:parameters].inspect
-            end
+        if options[:show_resource_diff]
+          Puppet.debug("Resource diff: #{resource[:resource_id]}")
 
+          diff_array = str_diff(
+            Puppet::CatalogDiff::Formater.new.resource_to_string(resource),
+            Puppet::CatalogDiff::Formater.new.resource_to_string(new_resource),
+          ).split("\n")
+          if diff_array.size >= 3
+            string_differences[resource[:resource_id]] = diff_array[3..-1]
           else
-            differences_in_old[resource[:resource_id]] = resource
-
-            differences_in_new[resource[:resource_id]] = new_resource
+            Puppet.debug('Could not automatically detect diff')
+            string_differences[resource[:resource_id]] = resource[:parameters].inspect + new_resource[:parameters].inspect
           end
 
-          if options[:content_diff] && resource[:parameters][:content] && new_resource[:parameters][:content] && resource[:parameters][:content][:checksum] != new_resource[:parameters][:content][:checksum]
-            content_differences[resource[:resource_id]] = str_diff(resource[:parameters][:content][:content], new_resource[:parameters][:content][:content])
-          end
+        else
+          differences_in_old[resource[:resource_id]] = resource
+
+          differences_in_new[resource[:resource_id]] = new_resource
         end
 
+        cont_diff = str_diff(resource[:parameters][:content], new_resource[:parameters][:content])
+        content_differences[resource[:resource_id]] = cont_diff if cont_diff
       end
       resource_differences[:old] = differences_in_old
       resource_differences[:new] = differences_in_new
@@ -90,16 +80,15 @@ module Puppet::CatalogDiff
 
     # filter parameters
     def filter_parameters!(params, blacklist)
-      params.reject! { |p, k| blacklist.include?(p.to_s) }
+      params.reject! { |p, _k| blacklist.include?(p.to_s) }
     end
 
     # sort require/before/notify/subscribe before comparison
     def sort_dependencies!(params)
       params.each do |x|
-        if [:require, :before, :notify, :subscribe].include?(x[0])
-          if x[1].class == Array
-            x[1].sort!
-          end
+        next unless [:require, :before, :notify, :subscribe].include?(x[0])
+        if x[1].class == Array
+          x[1].sort!
         end
       end
     end
@@ -108,22 +97,22 @@ module Puppet::CatalogDiff
     def return_resource_diffs(r1, r2)
       only_in_old = []
       (r2 - r1).each do |r|
-        only_in_old << "#{r}"
+        only_in_old << r.to_s
       end
       only_in_new = []
       (r1 - r2).each do |r|
-        only_in_new << "#{r}"
+        only_in_new << r.to_s
       end
       differences = {
-        :titles_only_in_old => only_in_old,
-        :titles_only_in_new => only_in_new,
+        titles_only_in_old: only_in_old,
+        titles_only_in_new: only_in_new,
       }
       differences
     end
 
     def do_str_diff(str1, str2)
-      paths = [str1,str2].collect do |s|
-        tempfile = Tempfile.new("puppet-diffing")
+      paths = [str1, str2].map do |s|
+        tempfile = Tempfile.new('puppet-diffing')
         tempfile.open
         tempfile.print s
         tempfile.close
@@ -134,10 +123,29 @@ module Puppet::CatalogDiff
       diff
     end
 
-    def str_diff(str1, str2)
+    def str_diff(cont1, cont2)
+      return nil unless cont1 && cont2
+
+      if cont1.is_a?(Hash)
+        str1 = cont1[:content]
+        sum1 = cont1[:checksum]
+      else
+        str1 = cont1
+        sum1 = Digest::MD5.hexdigest(str1)
+      end
+
+      if cont2.is_a?(Hash)
+        str2 = cont2[:content]
+        sum2 = cont2[:checksum]
+      else
+        str2 = cont2
+        sum2 = Digest::MD5.hexdigest(str2)
+      end
+
+      return nil unless str1 && str2
+      return nil if sum1 == sum2
+
       @@cached_str_diffs ||= {}
-      sum1 = Digest::MD5.hexdigest str1
-      sum2 = Digest::MD5.hexdigest str2
       @@cached_str_diffs["#{sum1}/#{sum2}"] ||= do_str_diff(str1, str2)
     end
   end

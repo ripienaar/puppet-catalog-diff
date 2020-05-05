@@ -1,6 +1,5 @@
 module Puppet::CatalogDiff
   class FindCatalogs
-
     attr_accessor :old_catalog_path, :new_catalog_path
 
     def initialize(old_catalog_path, new_catalog_path)
@@ -27,13 +26,13 @@ module Puppet::CatalogDiff
       results_hash
     end
 
-    def return_matching_catalogs(old_results,new_results)
+    def return_matching_catalogs(old_results, new_results)
       # return a hash with new_path => old_path for all matching results
       new_results = return_filename_hash(new_results)
       old_results = return_filename_hash(old_results)
       matching_catalogs = {}
-      new_results.each do |filename,new_path|
-        if old_results.has_key?(filename)
+      new_results.each do |filename, new_path|
+        if old_results.key?(filename)
           Puppet.debug("Found matching catalog for #{new_path}")
           matching_catalogs[new_results[filename]] = old_results[filename]
         else
@@ -43,10 +42,10 @@ module Puppet::CatalogDiff
       matching_catalogs
     end
 
-    def return_catalogs(options = {})
+    def return_catalogs(_options = {})
       old = find_catalogs(old_catalog_path)
       new = find_catalogs(new_catalog_path)
-      return_matching_catalogs(old,new)
+      return_matching_catalogs(old, new)
     end
   end
 end

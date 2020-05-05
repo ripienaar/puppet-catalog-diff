@@ -4,15 +4,15 @@ module Puppet::CatalogDiff
     #
     # Dear Puppet 0.24.  Die.
     def capitalizeresource(resource)
-      res = ""
+      res = ''
 
-      if resource[0] =~ /class/i
-        res << "Class["
-        res << resource[1].split(/::/).map{|r| r.capitalize}.join("::")
-        res << "]"
+      if resource[0] =~ %r{class}i
+        res << 'Class['
+        res << resource[1].split(%r{::}).map { |r| r.capitalize }.join('::')
+        res << ']'
       else
         res << resource[0].capitalize
-        res << "[" << resource[1] << "]"
+        res << '[' << resource[1] << ']'
       end
 
       res
@@ -39,16 +39,15 @@ module Puppet::CatalogDiff
           convert24(b, collector)
         end
       elsif bucket.is_a?(Puppet::TransObject)
-        manifestfile = bucket.file.gsub("/etc/puppet/manifests/", "")
+        manifestfile = bucket.file.gsub('/etc/puppet/manifests/', '')
 
-        resource = {:type => bucket.type,
-          :title => bucket.name,
-          :parameters => {}}
+        resource = { type: bucket.type,
+                     title: bucket.name,
+                     parameters: {} }
 
         bucket.each do |param, value|
           resource[:parameters][param.to_sym] = value
         end
-
 
         # remove some dupe properties that 24 tends to put in
         # that 25 onward doesnt.  This isnt great since some people
@@ -56,16 +55,15 @@ module Puppet::CatalogDiff
         # will raise false positives but I guess the bulk use case
         # is being catered for here
         [:name, :command, :path].each do |property|
-          if resource[:parameters].include?(property)
-            if resource[:title] == resource[:parameters][property]
-              resource[:parameters].delete(property)
-            end
+          next unless resource[:parameters].include?(property)
+          if resource[:title] == resource[:parameters][property]
+            resource[:parameters].delete(property)
           end
         end
 
         # Fix up some other weird resources like File in 24 that used
         # name but now use path
-        if resource[:type] == "file" && resource[:parameters].include?(:name)
+        if resource[:type] == 'file' && resource[:parameters].include?(:name)
           resource[:parameters][:path] = resource[:parameters][:name]
           resource[:parameters].delete(:name)
         end
@@ -76,8 +74,8 @@ module Puppet::CatalogDiff
           end
         end
 
-        if resource[:parameters].include?(:content) and resource[:parameters][:content].is_a? String
-          resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
+        if resource[:parameters].include?(:content) && resource[:parameters][:content].is_a?(String)
+          resource[:parameters][:content] = { checksum: Digest::MD5.hexdigest(resource[:parameters][:content]), content: resource[:parameters][:content] }
         end
 
         resource[:resource_id] = "#{bucket.type.downcase}[#{bucket.name}]"
@@ -91,21 +89,21 @@ module Puppet::CatalogDiff
         resource.edges.each do |b|
           convert25(b, collector)
         end
-      elsif resource.is_a?(Puppet::Relationship) and resource.target.is_a?(Puppet::Resource) and resource.target.title
+      elsif resource.is_a?(Puppet::Relationship) && resource.target.is_a?(Puppet::Resource) && resource.target.title
         target = resource.target
         # Make this conditional otherwise it skips create_resources based resources
-        manifestfile = target.file.gsub("/etc/puppet/manifests/", "") if target.file
+        manifestfile = target.file.gsub('/etc/puppet/manifests/', '') if target.file
 
-        resource = {:type => target.type,
-          :title => target.title,
-          :parameters => {}}
+        resource = { type: target.type,
+                     title: target.title,
+                     parameters: {} }
 
         target.each do |param, value|
           resource[:parameters][param] = value
         end
 
-        if resource[:parameters].include?(:content) and resource[:parameters][:content].is_a? String
-          resource[:parameters][:content] = { :checksum => Digest::MD5.hexdigest(resource[:parameters][:content]), :content => resource[:parameters][:content] }
+        if resource[:parameters].include?(:content) && resource[:parameters][:content].is_a?(String)
+          resource[:parameters][:content] = { checksum: Digest::MD5.hexdigest(resource[:parameters][:content]), content: resource[:parameters][:content] }
         end
 
         resource[:resource_id] = "#{target.type.downcase}[#{target.title}]"
