@@ -37,6 +37,12 @@ module Puppet::CatalogDiff
         #resource[:parameters].delete(:command) unless new_resource[:parameters].include?(:command)
         #resource[:parameters].delete(:path) unless new_resource[:parameters].include?(:path)
 
+        if options[:ignore_parameters]
+          blacklist = options[:ignore_parameters].split(',')
+          filter_parameters!(new_resource[:parameters], blacklist)
+          filter_parameters!(resource[:parameters], blacklist)
+        end
+
         sort_dependencies!(new_resource[:parameters])
         sort_dependencies!(resource[:parameters])
 
@@ -80,6 +86,11 @@ module Puppet::CatalogDiff
       resource_differences[:old_params]  = parameters_in_old
       resource_differences[:new_params]  = parameters_in_new
       resource_differences
+    end
+
+    # filter parameters
+    def filter_parameters!(params, blacklist)
+      params.reject! { |p, k| blacklist.include?(p.to_s) }
     end
 
     # sort require/before/notify/subscribe before comparison
