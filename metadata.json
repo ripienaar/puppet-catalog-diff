@@ -1,7 +1,7 @@
 {
   "name": "camptocamp-catalog_diff",
   "version": "1.6.0",
-  "author": "R.I.Pienaar, Zack Smith & Raphaël Pinson",
+  "author": "camptocamp",
   "summary": "Compares two catalogs and shows the differences",
   "license": "Apache-2.0",
   "source": "https://github.com/camptocamp/puppet-catalog-diff",
