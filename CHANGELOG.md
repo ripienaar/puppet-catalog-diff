@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file. The format 
 - Support certless API [\#3](https://github.com/camptocamp/puppet-catalog-diff/pull/3) ([raphink](https://github.com/raphink))
 - Use v3 catalog API [\#2](https://github.com/camptocamp/puppet-catalog-diff/pull/2) ([raphink](https://github.com/raphink))
 
-### UNCATEGORIZED PRS; GO LABEL THEM
+### Fixed
 
 - Fix: v4/catalog returns an embedded catalog [\#5](https://github.com/camptocamp/puppet-catalog-diff/pull/5) ([raphink](https://github.com/raphink))
 - Check key in parsed catalog [\#1](https://github.com/camptocamp/puppet-catalog-diff/pull/1) ([raphink](https://github.com/raphink))
