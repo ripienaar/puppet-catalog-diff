@@ -169,4 +169,5 @@ viewed in markdown using the Rakefile in this directory. A web viewer is also be
 # Authors
 R.I.Pienaar <rip@devco.net> / www.devco.net / @ripienaar  
 Zack Smith <zack@puppetlabs.com> / @acidprime  
+Raphaël Pinson <raphael.pinson@camptocamp.com> / @raphink
 See change log
