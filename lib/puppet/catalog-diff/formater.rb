@@ -26,7 +26,8 @@ module Puppet::CatalogDiff
       str = ''
       str << indent if do_indent
       str << '{' << "\n"
-      v.each do |key, val|
+      keys = Hash[(v.sort_by { |key, val| key })]
+      keys.each_pair do |key, val|
         str << "\t     #{indent}     #{key} => "
         str << format_value(val, "#{indent}     ", true, ',', key)
       end
