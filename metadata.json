@@ -5,6 +5,8 @@
   "summary": "Compares two catalogs and shows the differences",
   "license": "Apache-2.0",
   "source": "https://github.com/camptocamp/puppet-catalog-diff",
+  "project_page": "https://github.com/camptocamp/puppet-catalog-diff",
+  "issues_url": "https://github.com/camptocamp/puppet-catalog-diff/issues",
   "dependencies": [
 
   ],
