@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.1.0](https://github.com/camptocamp/puppet-catalog-diff/tree/v2.1.0) (2020-06-10)
+
+[Full Changelog](https://github.com/camptocamp/puppet-catalog-diff/compare/v2.0.0...v2.1.0)
+
+### Added
+
+- Use \#notice instead of \#err for realtime message [\#26](https://github.com/camptocamp/puppet-catalog-diff/pull/26) ([raphink](https://github.com/raphink))
+- Add --exclude\_defined\_resources [\#25](https://github.com/camptocamp/puppet-catalog-diff/pull/25) ([raphink](https://github.com/raphink))
+
 ## [v2.0.0](https://github.com/camptocamp/puppet-catalog-diff/tree/v2.0.0) (2020-05-05)
 
 [Full Changelog](https://github.com/camptocamp/puppet-catalog-diff/compare/v1.7.0...v2.0.0)

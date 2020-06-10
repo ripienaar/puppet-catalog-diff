@@ -1,6 +1,6 @@
 {
   "name": "camptocamp-catalog_diff",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "camptocamp",
   "summary": "Compares two catalogs and shows the differences",
   "license": "Apache-2.0",
@@ -63,5 +63,5 @@
   ],
   "pdk-version": "1.17.0",
   "template-url": "https://github.com/puppetlabs/pdk-templates.git#master",
-  "template-ref": "heads/master-0-g095317c"
+  "template-ref": "heads/master-0-g88b05c7"
 }
