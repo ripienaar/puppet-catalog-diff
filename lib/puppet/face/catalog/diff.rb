@@ -40,6 +40,10 @@ Puppet::Face.define(:catalog, '0.0.1') do
       summary 'Do not print defined resources in resource diffs'
     end
 
+    option '--exclude_resource_types=' do
+      summary 'A comma-separated list of (capitalized) resource types to exclude from the diff'
+    end
+
     option '--ignore_parameters=' do
       summary 'A comma-separated list of resource parameters to ignore in diff'
     end

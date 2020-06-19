@@ -71,6 +71,13 @@ module Puppet::CatalogDiff
         end
       end
 
+      if options[:exclude_resource_types]
+        types = options[:exclude_resource_types].split(',')
+        [to, from].each do |c|
+          c.reject! { |x| types.include?(x[:type]) }
+        end
+      end
+
       Puppet.debug("Processing: #{from_file}")
       titles = {}
       titles[:to] = extract_titles(to)
