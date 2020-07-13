@@ -84,8 +84,8 @@ module Puppet::CatalogDiff
       titles[:from] = extract_titles(from)
 
       output = {}
-      output[:old_version] = from_meta[:version]
-      output[:new_version] = to_meta[:version]
+      output[:old_version] = from_meta[:version].to_s
+      output[:new_version] = to_meta[:version].to_s
 
       output[:old_environment] = from_meta[:environment]
       output[:new_environment] = to_meta[:environment]
