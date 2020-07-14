@@ -6,6 +6,9 @@
 [![Coverage Status](https://img.shields.io/coveralls/camptocamp/puppet-catalog-diff.svg)](https://coveralls.io/r/camptocamp/puppet-catalog-diff)
 [![By Camptocamp](https://img.shields.io/badge/by-camptocamp-fb7047.svg)](http://www.camptocamp.com)
 
+
+![Catalog Diff](https://repository-images.githubusercontent.com/258246631/a83eae80-c5c9-11ea-8123-097fd9be6f2b)
+
 ## Overview
 
 A tool to compare two Puppet catalogs.
