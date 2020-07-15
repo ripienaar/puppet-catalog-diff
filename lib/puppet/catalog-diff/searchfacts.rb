@@ -43,7 +43,7 @@ module Puppet::CatalogDiff
                ['=', 'title', capit]]]]]],
         )
       end
-      json_query = URI.escape(query.to_json)
+      json_query = URI.encode_www_form_component(query.to_json)
       begin
         filtered = PSON.parse(connection.request_get("/pdb/query/v4/nodes?query=#{json_query}", 'Accept' => 'application/json').body)
       rescue PSON::ParserError => e
