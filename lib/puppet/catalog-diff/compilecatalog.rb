@@ -53,7 +53,7 @@ module Puppet::CatalogDiff
       _server, environment = server.split('/')
       environment ||= lookup_environment(node_name)
       query.concat([['=', 'environment', environment]])
-      json_query = URI.escape(query.to_json)
+      json_query = URI.encode_www_form_component(query.to_json)
       ret = connection.request_get("/pdb/query/v4/catalogs?query=#{json_query}", 'Accept' => 'application/json').body
       begin
         catalog = PSON.parse(ret)
