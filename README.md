@@ -1,7 +1,7 @@
 What?
 =====
 
-**NOTE:** You should now use https://forge.puppetlabs.com/zack/catalog_diff
+**NOTE:** You should now use https://forge.puppet.com/camptocamp/catalog_diff
 which is well maintained and recent :)
 
 
