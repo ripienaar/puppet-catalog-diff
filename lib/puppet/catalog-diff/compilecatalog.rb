@@ -16,7 +16,10 @@ module Puppet::CatalogDiff
       catalog = if catalog_from_puppetdb
                   get_catalog_from_puppetdb(node_name, server)
                 else
-                  compile_catalog(node_name, server, certless)
+                  catalog = compile_catalog(node_name, server, certless)
+                  clean_sensitive_parameters!(catalog)
+                  clean_nested_sensitive_parameters!(catalog)
+                  catalog
                 end
       catalog = render_pson(catalog)
       begin
@@ -120,6 +123,41 @@ module Puppet::CatalogDiff
       pson = PSON.pretty_generate(catalog, allow_nan: true, max_nesting: false)
       raise "Could not render catalog as pson, #{catalog}" unless pson
       pson
+    end
+
+    def clean_sensitive_parameters!(catalog)
+      catalog['resources'].map! do |resource|
+        if resource.key? 'sensitive_parameters'
+          resource['sensitive_parameters'].each do |p|
+            hash = Digest::SHA256.hexdigest Marshal.dump(resource['parameters'][p])
+            resource['parameters'][p] = "Sensitive [hash #{hash}]"
+          end
+          resource.delete('sensitive_parameters')
+        end
+        resource
+      end
+    end
+
+    def clean_nested_sensitive_parameters!(catalog)
+      # Resources can also contain sensitive data nested deep in hashes/arrays
+      catalog['resources'].each do |resource|
+        redact_sensitive(resource['parameters']) if resource.key? 'parameters'
+      end
+    end
+
+    def redact_sensitive(data)
+      if data.is_a?(Hash) && data.key?('__ptype')
+        data[:catalog_diff_hash] = Digest::SHA256.hexdigest Marshal.dump(data['__pvalue'])
+        data.reject! { |k| k == '__ptype' || k == '__pvalue' }
+      elsif data.is_a? Hash
+        data.each do |_k, v|
+          redact_sensitive(v) if v.is_a?(Hash) || v.is_a?(Array)
+        end
+      elsif data.is_a? Array
+        data.each do |v|
+          redact_sensitive(v) if v.is_a?(Hash) || v.is_a?(Array)
+        end
+      end
     end
 
     def save_catalog_to_disk(save_directory, node_name, catalog, extention)
